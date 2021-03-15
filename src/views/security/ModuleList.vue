@@ -30,19 +30,19 @@
               </a>
               <template #overlay>
                 <a-menu>
-                  <a-menu-item @click="handleEditEvent('VIEW', record.id)"
-                    >查看</a-menu-item
-                  >
-                  <a-menu-item @click="handleEditEvent('EDIT', record.id)"
-                    >修改</a-menu-item
-                  >
+                  <a-menu-item @click="handleEditEvent('VIEW', record.id)">
+                    查看
+                  </a-menu-item>
+                  <a-menu-item @click="handleEditEvent('EDIT', record.id)">
+                    修改
+                  </a-menu-item>
                   <a-menu-item @click="handleEditEvent('DELETE', record.id)">
                     删除
                   </a-menu-item>
                   <a-menu-divider />
-                  <a-menu-item @click="handleEditEvent('AUDTH', record.id)"
-                    >审核</a-menu-item
-                  >
+                  <a-menu-item @click="handleEditEvent('AUDTH', record.id)">
+                    审核
+                  </a-menu-item>
                 </a-menu>
               </template>
             </a-dropdown>
@@ -80,7 +80,7 @@
       </a-table>
     </a-spin>
   </div>
-  <d-drawer :title="formTitle" ref="refEditWrap">
+  <d-drawer :title="formTitle" ref="refEditWrap" :refreshParent="refreshPage">
     <module-form></module-form>
   </d-drawer>
   <d-drawer title="查看表单" ref="refViewWrap" :footerVisible="false">
@@ -107,8 +107,8 @@ export default {
     ModuleView
   },
   setup() {
-    const refEditWrap = ref();
-    const refViewWrap = ref();
+    const refEditWrap = ref(); // 编辑
+    const refViewWrap = ref(); // 查看
     // Vue2.0中 data
     const state = reactive({
       formTitle: "",
@@ -194,6 +194,15 @@ export default {
           state.loading = false;
         });
     };
+    // 刷新页面
+    const refreshPage = () => {
+      //alert(val + "=======" + txt);
+      let param = {
+        pageSize: state.pagination.pageSize,
+        current: state.pagination.current
+      };
+      loadData(param);
+    };
     // 加载事件
     onMounted(() => {
       let param = {
@@ -207,7 +216,8 @@ export default {
       handleTableChange,
       handleEditEvent,
       refEditWrap,
-      refViewWrap
+      refViewWrap,
+      refreshPage
     };
   }
 };

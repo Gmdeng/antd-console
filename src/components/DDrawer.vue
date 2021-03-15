@@ -11,7 +11,12 @@
   >
     <slot />
     <div class="footer" v-if="footerVisible">
-      <a-button type="primary" @click="onSubmitHandle">{{ okText }}</a-button>
+      <a-button
+        type="primary"
+        @click="onSubmitHandle"
+        :loading="submitLoading"
+        >{{ okText }}</a-button
+      >
       &nbsp; <a-button @click="onResetHandle">{{ resetText }}</a-button> &nbsp;
       <a-button @click="onClose" style="float:right">{{ cancelText }}</a-button>
       &nbsp;
@@ -48,19 +53,27 @@ export default defineComponent({
     cancelText: {
       type: String,
       default: "取消"
+    },
+    refreshParent: {
+      type: Function,
+      default: () => {
+        alert("No Refresh Data");
+      }
     }
   },
-  setup() {
+  setup(props) {
     const { ctx } = getCurrentInstance();
     // 通过reactive 可以初始化一个可响应的数据，与Vue2.0中的Vue.observer很相似
     const state = reactive({
-      visible: false,
-      submitLoading: false,
-      data: undefined,
+      visible: false, //是否显示
+      submitLoading: false, //提交状态
+      data: undefined, // 数据
       onSubmitEvent: async e => {
+        // 定义提交事件
         e.preventDefault();
       },
       onResetEvent: async e => {
+        // 定义重置事件
         e.preventDefault();
       }
     });
@@ -76,42 +89,49 @@ export default defineComponent({
     /*==与子组件进行交互==================================== */
 
     // 重新设置处理事件入口
-    const interEvtSubmit = process => {
-      // console.info("setup event submit");
-      // ctx.$message.info("setup event submit");
-      state.onSubmitEvent = process;
-    };
-    const interEvtReset = process => {
-      state.onResetEvent = process;
-    };
-    // 提供调用
+
+    // 提供子组件调用
     provide("interData", toRef(state, "data"));
-    provide("interEvtSubmit", interEvtSubmit);
-    provide("interEvtReset", interEvtReset);
+    provide("interEvtSubmit", process => {
+      if (typeof process == "function") {
+        state.onSubmitEvent = process;
+      }
+    });
+    provide("interEvtReset", process => {
+      if (typeof process == "function") {
+        state.onResetEvent = process;
+      }
+    });
 
     /*==操作处理事件==================================== */
 
     // 提交事件
     const onSubmitHandle = async evt => {
+      state.submitLoading = true;
       evt.preventDefault();
-      if (typeof state.onSubmitEvent == "function") {
-        try {
-          await state.onSubmitEvent(evt);
-        } catch (error) {
-          console.error(error);
-          ctx.$message.error(error);
+      try {
+        let ret = await state.onSubmitEvent(evt);
+        if (ret) {
+          // 刷新parent组件
+          props.refreshParent();
           state.visible = false;
+        } else {
+          alert(978);
         }
-      } else {
-        state.visible = false;
+        //context.emit("testRefresh", "Ricky", "G-M");
+      } catch (error) {
+        console.error(error);
+        ctx.$message.error(error);
+        //state.submitLoading = false;
+        //state.visible = false;
       }
+      state.submitLoading = false;
     };
     const onResetHandle = async evt => {
       evt.preventDefault();
-      if (typeof state.onResetEvent == "function") {
-        state.onResetEvent();
-      }
+      state.onResetEvent();
     };
+    // 暴露方法\属性变量
     return {
       state,
       Open,

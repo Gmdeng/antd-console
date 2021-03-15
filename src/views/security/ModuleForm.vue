@@ -68,6 +68,7 @@ import {
   toRaw,
   toRefs
 } from "vue";
+import { notification } from "ant-design-vue";
 import moduleApi from "@/api/moduleApi";
 import { useForm } from "@ant-design-vue/use";
 import { limitNumber } from "@/library/utils/Functions";
@@ -188,6 +189,7 @@ export default defineComponent({
         }
       ]
     });
+    // 表单
     const { resetFields, validate, validateInfos } = useForm(
       frmModel,
       rulesRef
@@ -201,12 +203,24 @@ export default defineComponent({
         let data = await validate();
         console.log(toRaw(frmModel));
         console.log(data);
-        alert("完成" + JSON.stringify(toRaw(frmModel)));
-        moduleApi.saveData(toRaw(frmModel));
+        let ret = await moduleApi.saveData(toRaw(frmModel));
+        if (ret.code === 0) {
+          // alert("Success:" + JSON.stringify(ret.msg));
+          notification["success"]({
+            message: "数据提交成功",
+            description: "正在为您刷新当前页面数据."
+          });
+        } else {
+          //alert("Fail:" + JSON.stringify(ret.data));
+          notification["warning"]({
+            message: "数据异常",
+            description: "." + ret.data
+          });
+        }
         return true;
       } catch (err) {
-        console.log("error", err);
-        new Error("参数必须是number类型，并且小于等于10");
+        console.error("error", err);
+        return false;
       }
     });
     interEvtReset(async () => {

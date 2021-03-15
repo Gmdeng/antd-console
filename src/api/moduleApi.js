@@ -10,7 +10,7 @@ export default {
    */
   getDataListByPage(params) {
     console.info(JSON.stringify(params));
-    return Axios.post(`${BASE_URL}/getDataListByPage`);
+    return Axios.post(`${BASE_URL}/getList`);
   },
   /**
    * 保存
