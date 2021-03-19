@@ -116,7 +116,7 @@ export default defineComponent({
           props.refreshParent();
           state.visible = false;
         } else {
-          alert(978);
+          // alert(978);
         }
         //context.emit("testRefresh", "Ricky", "G-M");
       } catch (error) {

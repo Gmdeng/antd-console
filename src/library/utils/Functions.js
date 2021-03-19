@@ -64,6 +64,7 @@ export function limitNumber(value) {
  * @param {返回} ret
  */
 export function handleHttpResut(ret) {
+  // alert(ret.code);
   if (ret.code === 0) {
     notification["success"]({
       message: "数据提交成功",

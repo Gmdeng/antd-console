@@ -71,13 +71,13 @@ import {
 
 import moduleApi from "@/api/moduleApi";
 import { useForm } from "@ant-design-vue/use";
-import { limitNumber,handleHttpResut } from "@/library/utils/Functions";
+import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
 export default defineComponent({
   name: "ModuleForm",
   setup() {
-    // 接
-    const interEvtSubmit = inject("interEvtSubmit");
-    const interEvtReset = inject("interEvtReset");
+    // 接口
+    const invokingEvtSubmit = inject("interEvtSubmit");
+    const invokingEvtReset = inject("interEvtReset");
     const interData = inject("interData");
     // Vue2.0中 data 定义变量名称
     const state = reactive({
@@ -145,7 +145,8 @@ export default defineComponent({
       operate: [32], // 权限
       remarks: "" // 描述
     });
-    const rulesRef = reactive({
+    // 表单验证规则
+    const frmRules = reactive({
       name: [
         {
           required: true,
@@ -192,34 +193,27 @@ export default defineComponent({
     // 表单
     const { resetFields, validate, validateInfos } = useForm(
       frmModel,
-      rulesRef
+      frmRules
     );
     //提交处理
-    // const processSubmit = ;
-    // const processReset = ;
     // 调用上级接口
-    interEvtSubmit(async () => {
+    invokingEvtSubmit(async () => {
       try {
         let data = await validate();
         console.log(toRaw(frmModel));
         console.log(data);
         let ret = await moduleApi.saveData(toRaw(frmModel));
-        handleHttpResut(ret);
-        if (ret.code === 0) {
-          // alert("Success:" + JSON.stringify(ret.msg));
-          // notification["success"]({
-          //   message: "数据提交成功",
-          //   description: "正在为您刷新当前页面数据."
-          // });
-          return true;
-        }
-        return false;
+        // if (ret.code === 0) {
+        //   return true;
+        // }
+        // 处理提示
+        return handleHttpResut(ret);
       } catch (err) {
         console.error("error", err);
         return false;
       }
     });
-    interEvtReset(async () => {
+    invokingEvtReset(async () => {
       resetFields();
     });
     // 初始化表单
@@ -230,7 +224,7 @@ export default defineComponent({
         }
       });
     };
-    // 加载初始化数据
+    // 初始化数据
     onMounted(() => {
       // console.info("onMounted...." + interData.value);
       //console.info(JSON.stringify(interData.value));
