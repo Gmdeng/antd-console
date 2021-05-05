@@ -75,10 +75,11 @@ import { limitNumber } from "@/library/utils/Functions";
 export default defineComponent({
   name: "ModuleForm",
   setup() {
-    // 接
+    // 接口
     const interEvtSubmit = inject("interEvtSubmit");
     const interEvtReset = inject("interEvtReset");
     const interData = inject("interData");
+    const interEvtCloseLoad = inject("interEvtCloseLoad");
     // Vue2.0中 data 定义变量名称
     const state = reactive({
       operateList: [
@@ -89,53 +90,20 @@ export default defineComponent({
         { value: 16, label: "审核" },
         { value: 32, label: "查看" }
       ],
-      dsTreeData: [
-        {
-          title: "根目录", //按照官方文档这里的键值对应该是title 下面就不写注释了
-          value: "0", //按照光放文档这里的键值对应该是value 下面就不写注释了
-          key: "0-0"
-        },
-
-        {
-          title: "Node1", //按照官方文档这里的键值对应该是title 下面就不写注释了
-          value: "1", //按照光放文档这里的键值对应该是value 下面就不写注释了
-          key: "0-1",
-          children: [
-            {
-              title: "Child Node1", //title
-              value: "0-1-1", // value
-              key: "0-1-1"
-            },
-            {
-              title: "Child Node2",
-              value: "0-1-2",
-              key: "0-1-2"
-            }
-          ]
-        },
-        {
-          title: "Node2",
-          value: "2",
-          key: "0-2",
-          children: [
-            {
-              title: "Child Node2-1",
-              value: "0-2-1",
-              key: "0-2-1"
-            },
-            {
-              title: "Child Node2-2",
-              value: "0-2-2",
-              key: "0-2-2"
-            }
-          ]
-        }
-      ]
+      dsTreeData: []
     });
+    moduleApi.getTreeSelects().then(res => {
+      if( res.code == 0){
+        state.dsTreeData =[];
+        state.dsTreeData.push(res.data);
+        //alert(JSON.stringify(res.data));
+        
+      }
+    })
     // 表单绑定数据
     const frmModel = reactive({
       id: "", // ID
-      parentId: "", // ID
+      parentId: "0", // ID
       code: "", // 编码
       name: "", // 名称
       idx: "", // 排序
@@ -210,20 +178,22 @@ export default defineComponent({
             message: "数据提交成功",
             description: "正在为您刷新当前页面数据."
           });
+          return true;
         } else {
           //alert("Fail:" + JSON.stringify(ret.data));
           notification["warning"]({
             message: "数据异常",
-            description: "." + ret.data
+            description: "." + ret.msg
           });
         }
-        return true;
+        return false;
       } catch (err) {
         console.error("error", err);
         return false;
       }
     });
     interEvtReset(async () => {
+      
       resetFields();
     });
     // 初始化表单
@@ -231,6 +201,8 @@ export default defineComponent({
       moduleApi.getDetail(frmModel.id).then(res => {
         if (res.code == 0) {
           Object.assign(frmModel, res.data);
+          // 
+          interEvtCloseLoad();
         }
       });
     };
@@ -240,6 +212,7 @@ export default defineComponent({
       //console.info(JSON.stringify(interData.value));
       if (interData.value == undefined) {
         frmModel.id = null;
+        interEvtCloseLoad();
       } else {
         frmModel.id = interData.value;
         initFormData();

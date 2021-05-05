@@ -9,18 +9,22 @@
     @close="onClose"
     destroy-on-close
   >
+  <a-spin size="large" tip="Loading..." :spinning="state.spinning">
+    spinning:{{state.spinning}}
     <slot />
+   </a-spin>
     <div class="footer" v-if="footerVisible">
       <a-button
         type="primary"
         @click="onSubmitHandle"
-        :loading="submitLoading"
-        >{{ okText }}</a-button
-      >
-      &nbsp; <a-button @click="onResetHandle">{{ resetText }}</a-button> &nbsp;
+        :loading="state.submitLoading"
+        :disabled="state.spinning"
+        > {{ okText }} </a-button>
+      &nbsp; <a-button @click="onResetHandle" :disabled="state.spinning">{{ resetText }}</a-button> &nbsp;
       <a-button @click="onClose" style="float:right">{{ cancelText }}</a-button>
       &nbsp;
     </div>
+ 
   </a-drawer>
 </template>
 <script>
@@ -65,6 +69,7 @@ export default defineComponent({
     const { ctx } = getCurrentInstance();
     // 通过reactive 可以初始化一个可响应的数据，与Vue2.0中的Vue.observer很相似
     const state = reactive({
+      spinning: true,
       visible: false, //是否显示
       submitLoading: false, //提交状态
       data: undefined, // 数据
@@ -102,7 +107,9 @@ export default defineComponent({
         state.onResetEvent = process;
       }
     });
-
+    provide("interEvtCloseLoad", ()=> {
+      state.spinning = false
+    });
     /*==操作处理事件==================================== */
 
     // 提交事件
@@ -115,14 +122,15 @@ export default defineComponent({
           // 刷新parent组件
           props.refreshParent();
           state.visible = false;
-        } else {
-          alert(978);
+        }else{
+          // state.submitLoading = false;
         }
         //context.emit("testRefresh", "Ricky", "G-M");
       } catch (error) {
+        // alert(99978);
         console.error(error);
         ctx.$message.error(error);
-        //state.submitLoading = false;
+        // state.submitLoading = false;
         //state.visible = false;
       }
       state.submitLoading = false;

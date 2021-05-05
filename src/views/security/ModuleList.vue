@@ -11,6 +11,7 @@
       </template>
     </a-page-header>
   </div>
+  {{dataList}}
   <!-- 头部内容end -->
   <div class="gm-container">
     <a-spin :spinning="loading" style="width: 100%">
@@ -64,6 +65,9 @@
         <a-table-column key="url" title="链接地址" data-index="url" />
         <a-table-column key="operate" title="权限" data-index="operate">
           <template #default="{ text: operate }">
+            <span v-for="(it, k) in operate" :key="k">
+              <a-tag>{{it}}</a-tag>
+            </span>
             <span v-for="(it, k) in operateList" :key="k">
               <a-tag :color="it.color" v-if="(operate & it.key) == it.key">
                 {{ it.text }}
@@ -184,8 +188,12 @@ export default {
         .getDataListByPage(param)
         .then(res => {
           if (res.code == 0) {
-            state.pagination.total = res.data.totalRecord;
-            state.dataList = res.data.dataList;
+            // alert(JSON.stringify(res.dataList));
+            // alert(JSON.stringify(res.pager));
+            state.pagination.total = res.pager.totalRecord;
+            state.pagination.pageSize = res.pager.pageSize;
+            state.dataList = res.dataList;
+            // alert(JSON.stringify(state.dataList));
           }
           state.loading = false;
         })
