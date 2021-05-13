@@ -92,6 +92,7 @@ export default defineComponent({
       ],
       dsTreeData: []
     });
+    // 
     moduleApi.getTreeSelects().then(res => {
       if( res.code == 0){
         state.dsTreeData =[];
@@ -106,7 +107,7 @@ export default defineComponent({
       parentId: "0", // ID
       code: "", // 编码
       name: "", // 名称
-      idx: "", // 排序
+      idx: 0, // 排序
       type: "M", // 类型
       icon: "", // 图标
       url: "", // 链接地址
@@ -162,9 +163,7 @@ export default defineComponent({
       frmModel,
       rulesRef
     );
-    //提交处理
-    // const processSubmit = ;
-    // const processReset = ;
+
     // 调用上级接口
     interEvtSubmit(async () => {
       try {
@@ -198,7 +197,7 @@ export default defineComponent({
     });
     // 初始化表单
     const initFormData = () => {
-      moduleApi.getDetail(frmModel.id).then(res => {
+      moduleApi.getFormData(frmModel.id).then(res => {
         if (res.code == 0) {
           Object.assign(frmModel, res.data);
           // 

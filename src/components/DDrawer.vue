@@ -33,6 +33,7 @@ import {
   reactive,
   provide,
   toRef,
+  watch,
   getCurrentInstance
 } from "vue";
 
@@ -80,6 +81,15 @@ export default defineComponent({
       onResetEvent: async e => {
         // 定义重置事件
         e.preventDefault();
+      }
+    });
+    // 观察
+    watch(() => state.visible, (newValue, oldValue) => {
+          //alert(newValue +" === "+ oldValue);
+      // 因为watch被观察的对象只能是getter/effect函数、ref、热active对象或者这些类型是数组
+      // 所以需要将state.count变成getter函数
+      if(newValue == false && oldValue == true){
+        state.spinning = true;
       }
     });
     // 方法

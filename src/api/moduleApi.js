@@ -25,10 +25,26 @@ export default {
   },
 
   /**
+   * 审核
+   * @param {moduleId:157, status:0} formData 
+   * @returns 
+   */
+   authData(formData) {
+    return Axios.post(`${BASE_URL}/authData`, formData);
+  },
+  /**
+   * 获取表单明细
+   * @param {ID} id
+   */
+  getFormData(id) {
+    return Axios.get(`${BASE_URL}/getFormData?id=${id}`);
+  },
+
+  /**
    * 获取明细
    * @param {ID} id
    */
-  getDetail(id) {
+   getDetail(id) {
     return Axios.get(`${BASE_URL}/getDetail?id=${id}`);
   },
   /**

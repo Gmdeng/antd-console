@@ -11,7 +11,6 @@
       </template>
     </a-page-header>
   </div>
-  {{dataList}}
   <!-- 头部内容end -->
   <div class="gm-container">
     <a-spin :spinning="loading" style="width: 100%">
@@ -31,19 +30,11 @@
               </a>
               <template #overlay>
                 <a-menu>
-                  <a-menu-item @click="handleEditEvent('VIEW', record.id)">
-                    查看
-                  </a-menu-item>
-                  <a-menu-item @click="handleEditEvent('EDIT', record.id)">
-                    修改
-                  </a-menu-item>
-                  <a-menu-item @click="handleEditEvent('DELETE', record.id)">
-                    删除
-                  </a-menu-item>
+                  <a-menu-item @click="handleEditEvent('VIEW', record.id)">查看</a-menu-item>
+                  <a-menu-item @click="handleEditEvent('EDIT', record.id)">修改</a-menu-item>
+                  <a-menu-item @click="handleEditEvent('DELETE', record.id)">删除</a-menu-item>
                   <a-menu-divider />
-                  <a-menu-item @click="handleEditEvent('AUDTH', record.id)">
-                    审核
-                  </a-menu-item>
+                  <a-menu-item @click="handleEditEvent('AUDTH', record.id)">审核</a-menu-item>
                 </a-menu>
               </template>
             </a-dropdown>
@@ -52,9 +43,8 @@
             </span>
           </template>
         </a-table-column>
-        <a-table-column key="id" title="ID" data-index="id" />
-        <a-table-column key="name" title="名称" data-index="name" />
         <a-table-column key="code" title="编码" data-index="code" />
+        <a-table-column key="name" title="名称" data-index="name" />
         <a-table-column key="type" title="类型" data-index="type" />
         <a-table-column key="icon" title="图标" data-index="icon">
           <template #default="{ record }">
@@ -94,7 +84,8 @@
 <script>
 import { createVNode, reactive, ref, toRefs, onMounted } from "vue";
 import { DownOutlined, EditOutlined } from "@ant-design/icons-vue";
-import { Modal } from "ant-design-vue";
+import { Modal, notification } from "ant-design-vue";
+
 import { DDrawer } from "@/components";
 
 import moduleApi from "@/api/moduleApi";
@@ -146,21 +137,43 @@ export default {
         refEditWrap.value.Open(data);
       } else if (type == "VIEW") {
         refViewWrap.value.Open(data);
-      } else if (type == "DELETE" || type == "AUTH") {
-        let typeText = type == "DELETE" ? "删除" : "审核";
-        Modal.confirm({
-          title: `确认想${typeText}这条记录吗?`,
-          icon: createVNode(DownOutlined),
-          content:
-            "When clicked the OK button, this dialog will be closed after 1 second",
-          onOk() {
-            return new Promise((resolve, reject) => {
-              setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-            }).catch(() => console.log("Oops errors!"));
-          },
-          onCancel() {}
-        });
+      } else {
+        // if (type == "DELETE" || type == "AUTH") 
+        handleSimpleEvent(type, data);
       }
+    };
+    //
+    const handleSimpleEvent = (type, data) =>{
+      let typeText = type == "DELETE" ? "删除" : "审核";
+      Modal.confirm({
+        title: `确认想${typeText}这条记录吗?`,
+        icon: createVNode(DownOutlined),
+        content:
+          "When clicked the OK button, this dialog will be closed after 1 second" + data,
+        onOk() {
+          // return new Promise((resolve, reject) => {
+          //   setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
+          // }).catch(() => console.log("Oops errors!"));
+          moduleApi.authData({moduleId: data, status: 1})
+            .then(res=>{
+              if(res.code == 0){
+                notification["success"]({
+                  message: "数据提交成功",
+                  description: "正在为您刷新当前页面数据.",
+                  onClose: ()=>{
+                    refreshPage();
+                  }
+                });
+              }else{
+                notification["warning"]({
+                  message: "数据异常",
+                  description: "." + res.msg
+                });
+              }
+            });
+        },
+        onCancel() {}
+      });
     };
     // 列表分页事件
     const handleTableChange = (pagination, filters, sorter, ds) => {
