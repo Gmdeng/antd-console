@@ -132,8 +132,13 @@ export default defineComponent({
           // 刷新parent组件
           props.refreshParent();
           state.visible = false;
+<<<<<<< HEAD
         }else{
           // state.submitLoading = false;
+=======
+        } else {
+          // alert(978);
+>>>>>>> refs/remotes/origin/main
         }
         //context.emit("testRefresh", "Ricky", "G-M");
       } catch (error) {

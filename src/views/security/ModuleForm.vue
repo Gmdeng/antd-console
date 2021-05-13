@@ -68,16 +68,21 @@ import {
   toRaw,
   toRefs
 } from "vue";
-import { notification } from "ant-design-vue";
+
 import moduleApi from "@/api/moduleApi";
 import { useForm } from "@ant-design-vue/use";
-import { limitNumber } from "@/library/utils/Functions";
+import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
 export default defineComponent({
   name: "ModuleForm",
   setup() {
     // 接口
+<<<<<<< HEAD
     const interEvtSubmit = inject("interEvtSubmit");
     const interEvtReset = inject("interEvtReset");
+=======
+    const invokingEvtSubmit = inject("interEvtSubmit");
+    const invokingEvtReset = inject("interEvtReset");
+>>>>>>> refs/remotes/origin/main
     const interData = inject("interData");
     const interEvtCloseLoad = inject("interEvtCloseLoad");
     // Vue2.0中 data 定义变量名称
@@ -114,7 +119,8 @@ export default defineComponent({
       operate: [32], // 权限
       remarks: "" // 描述
     });
-    const rulesRef = reactive({
+    // 表单验证规则
+    const frmRules = reactive({
       name: [
         {
           required: true,
@@ -161,16 +167,21 @@ export default defineComponent({
     // 表单
     const { resetFields, validate, validateInfos } = useForm(
       frmModel,
-      rulesRef
+      frmRules
     );
+<<<<<<< HEAD
 
+=======
+    //提交处理
+>>>>>>> refs/remotes/origin/main
     // 调用上级接口
-    interEvtSubmit(async () => {
+    invokingEvtSubmit(async () => {
       try {
         let data = await validate();
         console.log(toRaw(frmModel));
         console.log(data);
         let ret = await moduleApi.saveData(toRaw(frmModel));
+<<<<<<< HEAD
         if (ret.code === 0) {
           // alert("Success:" + JSON.stringify(ret.msg));
           notification["success"]({
@@ -186,13 +197,24 @@ export default defineComponent({
           });
         }
         return false;
+=======
+        // if (ret.code === 0) {
+        //   return true;
+        // }
+        // 处理提示
+        return handleHttpResut(ret);
+>>>>>>> refs/remotes/origin/main
       } catch (err) {
         console.error("error", err);
         return false;
       }
     });
+<<<<<<< HEAD
     interEvtReset(async () => {
       
+=======
+    invokingEvtReset(async () => {
+>>>>>>> refs/remotes/origin/main
       resetFields();
     });
     // 初始化表单
@@ -205,7 +227,7 @@ export default defineComponent({
         }
       });
     };
-    // 加载初始化数据
+    // 初始化数据
     onMounted(() => {
       // console.info("onMounted...." + interData.value);
       //console.info(JSON.stringify(interData.value));

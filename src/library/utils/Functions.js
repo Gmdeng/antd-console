@@ -1,3 +1,5 @@
+import { notification } from "ant-design-vue";
+import { h } from "vue";
 /**
  * 树转列表
  *
@@ -55,4 +57,32 @@ export function limitNumber(value) {
   } else {
     return 0;
   }
+}
+
+/**
+ *
+ * @param {返回} ret
+ */
+export function handleHttpResut(ret) {
+  // alert(ret.code);
+  if (ret.code === 0) {
+    notification["success"]({
+      message: "数据提交成功",
+      description: "正在为您更新当前页面数据."
+    });
+    return true;
+  }
+
+  let errMsg = "NO Data";
+  //if (ret.code === 1000) {
+  //alert("Fail:" + typeof ret.data);
+  for (var key in ret.data) {
+    errMsg = key + ">" + ret.data[key];
+  }
+  //}
+  notification["warning"]({
+    message: "数据异常",
+    description: h("p", { style: "color: red" }, "." + errMsg)
+  });
+  return false;
 }
