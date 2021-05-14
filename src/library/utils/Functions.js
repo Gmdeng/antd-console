@@ -47,21 +47,21 @@ export function money(val) {
 
 /**
  * 正则替换小数点
- * @param {*} value
+ * @param {*} val
  */
-export function limitNumber(value) {
-  if (typeof value === "string") {
-    return !isNaN(Number(value)) ? value.replace(/\./g, "") : 0;
-  } else if (typeof value === "number") {
-    return !isNaN(value) ? String(value).replace(/\./g, "") : 0;
+export function limitNumber(val) {
+  if (typeof val === "string") {
+    return !isNaN(Number(val)) ? val.replace(/\./g, "") : 0;
+  } else if (typeof val === "number") {
+    return !isNaN(val) ? String(val).replace(/\./g, "") : 0;
   } else {
     return 0;
   }
 }
 
 /**
- *
- * @param {返回} ret
+ * 处理响应结果
+ * @param {*} ret {code: 0, data:[], message: ''}
  */
 export function handleHttpResut(ret) {
   // alert(ret.code);
@@ -73,16 +73,19 @@ export function handleHttpResut(ret) {
     return true;
   }
 
-  let errMsg = "NO Data";
+  //let errMsg = "";
   //if (ret.code === 1000) {
   //alert("Fail:" + typeof ret.data);
+  let arrErr = [];
   for (var key in ret.data) {
-    errMsg = key + ">" + ret.data[key];
+    arrErr.push(h("b", key));
+    arrErr.push(h("span", { style: "margin-left: 10px;" }, ret.data[key]));
+    arrErr.push(h("br"));
   }
-  //}
+  //
   notification["warning"]({
     message: "数据异常",
-    description: h("p", { style: "color: red" }, "." + errMsg)
+    description: h("p", { style: "color: red" }, arrErr)
   });
   return false;
 }
