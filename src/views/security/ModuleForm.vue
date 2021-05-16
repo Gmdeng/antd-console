@@ -68,10 +68,10 @@ import {
   toRaw,
   toRefs
 } from "vue";
-import { notification } from "ant-design-vue";
+
 import moduleApi from "@/api/moduleApi";
 import { useForm } from "@ant-design-vue/use";
-import { limitNumber } from "@/library/utils/Functions";
+import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
 export default defineComponent({
   name: "ModuleForm",
   setup() {
@@ -167,22 +167,8 @@ export default defineComponent({
         let data = await validate();
         console.log(toRaw(frmModel));
         console.log(data);
-        let ret = await moduleApi.saveData(toRaw(frmModel));
-        if (ret.code === 0) {
-          // alert("Success:" + JSON.stringify(ret.msg));
-          notification["success"]({
-            message: "数据提交成功",
-            description: "正在为您刷新当前页面数据.",
-          });
-          return true;
-        } else {
-          //alert("Fail:" + JSON.stringify(ret.data));
-          notification["warning"]({
-            message: "数据异常",
-            description: "." + ret.msg
-          });
-        }
-        return false;
+        let result = await moduleApi.saveData(toRaw(frmModel));
+        return handleHttpResut(result);
       } catch (err) {
         console.error("error", err);
         return false;

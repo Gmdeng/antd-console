@@ -82,12 +82,11 @@
   </d-drawer>
 </template>
 <script>
-import { createVNode, reactive, ref, toRefs, onMounted } from "vue";
+import { reactive, ref, toRefs, onMounted } from "vue";
 import { DownOutlined, EditOutlined } from "@ant-design/icons-vue";
-import { Modal, notification } from "ant-design-vue";
 
 import { DDrawer } from "@/components";
-
+import { handleSimpleEvent } from "@/library/utils/Functions";
 import moduleApi from "@/api/moduleApi";
 import ModuleForm from "./ModuleForm";
 import ModuleView from "./ModuleView";
@@ -137,44 +136,14 @@ export default {
         refEditWrap.value.Open(data);
       } else if (type == "VIEW") {
         refViewWrap.value.Open(data);
-      } else {
-        // if (type == "DELETE" || type == "AUTH") 
-        handleSimpleEvent(type, data);
+      } else if (type == "DELETE") {
+        // 
+        handleSimpleEvent("删除", moduleApi.deleteData, {moduleId: data}, refreshPage);
+      } else if(type == "AUDTH"){
+        handleSimpleEvent("审核", moduleApi.authData, {moduleId: data, status: 1}, refreshPage);
       }
     };
-    //
-    const handleSimpleEvent = (type, data) =>{
-      let typeText = type == "DELETE" ? "删除" : "审核";
-      Modal.confirm({
-        title: `确认想${typeText}这条记录吗?`,
-        icon: createVNode(DownOutlined),
-        content:
-          "When clicked the OK button, this dialog will be closed after 1 second" + data,
-        onOk() {
-          // return new Promise((resolve, reject) => {
-          //   setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-          // }).catch(() => console.log("Oops errors!"));
-          moduleApi.authData({moduleId: data, status: 1})
-            .then(res=>{
-              if(res.code == 0){
-                notification["success"]({
-                  message: "数据提交成功",
-                  description: "正在为您刷新当前页面数据.",
-                  onClose: ()=>{
-                    refreshPage();
-                  }
-                });
-              }else{
-                notification["warning"]({
-                  message: "数据异常",
-                  description: "." + res.msg
-                });
-              }
-            });
-        },
-        onCancel() {}
-      });
-    };
+    
     // 列表分页事件
     const handleTableChange = (pagination, filters, sorter, ds) => {
       //console.info(JSON.stringify(pagination));
@@ -224,7 +193,7 @@ export default {
       };
       loadData(param);
     };
-    // 加载事件
+    // 页面加载事件
     onMounted(() => {
       let param = {
         pageSize: state.pagination.pageSize,

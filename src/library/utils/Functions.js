@@ -1,5 +1,6 @@
-import { notification } from "ant-design-vue";
-import { h } from "vue";
+import { Modal, notification } from "ant-design-vue";
+import { h, createVNode } from "vue";
+import { DownOutlined } from "@ant-design/icons-vue";
 /**
  * 树转列表
  *
@@ -60,11 +61,50 @@ export function limitNumber(val) {
 }
 
 /**
+ * 处理事件
+ * @param {*} typeText 提示信息
+ * @param {*} apiHandler API处理事件
+ * @param {*} data 事件参数
+ * @param {*} callback 回调方法 
+ */
+export function handleSimpleEvent (typeText, apiHandler, data, callback){
+  //alert(apiHandler);
+  Modal.confirm({
+    title: `确认想${typeText}这条记录吗?`,
+    icon: createVNode(DownOutlined),
+    content:
+      "当点击确认按键后, 将该请求提交到后台进行处理.",
+    onOk() {
+      // return new Promise((resolve, reject) => {
+      //   setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
+      // }).catch(() => console.log("Oops errors!"));
+      apiHandler(data).then(res=>{
+        if(res.code == 0){
+          notification["success"]({
+            message: "数据处理成功",
+            description: "正在为您刷新当前页面数据.请稍后",
+            onClose: ()=>{
+              if(typeof(callback) == "function" )
+                callback();
+            }
+          });
+        }else{
+          notification["warning"]({
+            message: "数据处理异常",
+            description: "." + res.msg
+          });
+        }
+      });
+    },
+    onCancel() {}
+  });
+};
+
+/**
  * 处理响应结果
  * @param {*} ret {code: 0, data:[], message: ''}
  */
 export function handleHttpResut(ret) {
-  // alert(ret.code);
   if (ret.code === 0) {
     notification["success"]({
       message: "数据提交成功",
