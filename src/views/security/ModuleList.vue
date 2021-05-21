@@ -15,13 +15,13 @@
   <div class="gm-container">
     <a-spin :spinning="loading" style="width: 100%">
       <a-table
+        :defaultExpandAllRows="true"
+        :pagination="false"
         :row-key="record => record.id"
         :data-source="dataList"
         :loading="loading"
-        :pagination="pagination"
-        @change="handleTableChange"
       >
-        <a-table-column key="action" title="操作" width="110px">
+        <a-table-column key="action" title="操作" width="180px">
           <template #default="{ record }">
             <a-dropdown>
               <a class="ant-dropdown-link" @click.prevent>
@@ -30,11 +30,19 @@
               </a>
               <template #overlay>
                 <a-menu>
-                  <a-menu-item @click="handleEditEvent('VIEW', record.id)">查看</a-menu-item>
-                  <a-menu-item @click="handleEditEvent('EDIT', record.id)">修改</a-menu-item>
-                  <a-menu-item @click="handleEditEvent('DELETE', record.id)">删除</a-menu-item>
+                  <a-menu-item @click="handleEditEvent('VIEW', record.id)"
+                    >查看</a-menu-item
+                  >
+                  <a-menu-item @click="handleEditEvent('EDIT', record.id)"
+                    >修改</a-menu-item
+                  >
+                  <a-menu-item @click="handleEditEvent('DELETE', record.id)"
+                    >删除</a-menu-item
+                  >
                   <a-menu-divider />
-                  <a-menu-item @click="handleEditEvent('AUDTH', record.id)">审核</a-menu-item>
+                  <a-menu-item @click="handleEditEvent('AUDTH', record.id)"
+                    >审核</a-menu-item
+                  >
                 </a-menu>
               </template>
             </a-dropdown>
@@ -53,10 +61,10 @@
         </a-table-column>
         <a-table-column key="idx" title="排序" data-index="idx" />
         <a-table-column key="url" title="链接地址" data-index="url" />
-        <a-table-column key="operate" title="权限" data-index="operate">
+        <a-table-column key="operate" title="动作" data-index="operate">
           <template #default="{ text: operate }">
             <span v-for="(it, k) in operate" :key="k">
-              <a-tag>{{it}}</a-tag>
+              <a-tag>{{ it }}</a-tag>
             </span>
             <span v-for="(it, k) in operateList" :key="k">
               <a-tag :color="it.color" v-if="(operate & it.key) == it.key">
@@ -86,7 +94,10 @@ import { reactive, ref, toRefs, onMounted } from "vue";
 import { DownOutlined, EditOutlined } from "@ant-design/icons-vue";
 
 import { DDrawer } from "@/components";
-import { handleSimpleEvent } from "@/library/utils/Functions";
+import {
+  handleSimpleEvent,
+  TreeCleanEmptyNode
+} from "@/library/utils/Functions";
 import moduleApi from "@/api/moduleApi";
 import ModuleForm from "./ModuleForm";
 import ModuleView from "./ModuleView";
@@ -108,14 +119,6 @@ export default {
       formTitle: "",
       loading: true,
       dataList: [],
-      pagination: {
-        total: 0, //总条数
-        pageSize: 15, // 每页条数
-        defaultPageSize: 15, //默认每页显示数量
-        showSizeChanger: true, // 显示可改变每页数量
-        pageSizeOptions: ["15", "30", "50", "100"], // 每页数量选项
-        showTotal: (total, range) => `共 ${total} 条数据, - ${range} ` // 显示总数
-      },
       operateList: {
         ADD: { key: 1, text: "增加", color: "red" },
         MODIFY: { key: 2, text: "修改", color: "blue" },
@@ -137,32 +140,23 @@ export default {
       } else if (type == "VIEW") {
         refViewWrap.value.Open(data);
       } else if (type == "DELETE") {
-        // 
-        handleSimpleEvent("删除", moduleApi.deleteData, {moduleId: data}, refreshPage);
-      } else if(type == "AUDTH"){
-        handleSimpleEvent("审核", moduleApi.authData, {moduleId: data, status: 1}, refreshPage);
+        //
+        handleSimpleEvent(
+          "删除",
+          moduleApi.deleteData,
+          { moduleId: data },
+          refreshPage
+        );
+      } else if (type == "AUDTH") {
+        handleSimpleEvent(
+          "审核",
+          moduleApi.authData,
+          { moduleId: data, status: 1 },
+          refreshPage
+        );
       }
     };
-    
-    // 列表分页事件
-    const handleTableChange = (pagination, filters, sorter, ds) => {
-      //console.info(JSON.stringify(pagination));
-      console.info(JSON.stringify(filters));
-      console.info(JSON.stringify(sorter));
-      // console.info(JSON.stringify(ds.currentDataSource));
-      let param = {
-        pageSize: pagination.pageSize,
-        current: pagination.current
-      };
-      //
-      loadData(param);
-      return {
-        pagination,
-        filters,
-        sorter,
-        ds
-      };
-    };
+
     // 加载数据列表
     const loadData = param => {
       state.loading = true;
@@ -170,12 +164,10 @@ export default {
         .getDataListByPage(param)
         .then(res => {
           if (res.code == 0) {
-            // alert(JSON.stringify(res.dataList));
-            // alert(JSON.stringify(res.pager));
-            state.pagination.total = res.pager.totalRecord;
-            state.pagination.pageSize = res.pager.pageSize;
+            // state.pagination.total = res.pager.totalRecord;
+            // state.pagination.pageSize = res.pager.pageSize;
             state.dataList = res.dataList;
-            // alert(JSON.stringify(state.dataList));
+            TreeCleanEmptyNode(state.dataList);
           }
           state.loading = false;
         })
@@ -188,22 +180,21 @@ export default {
     const refreshPage = () => {
       //alert(val + "=======" + txt);
       let param = {
-        pageSize: state.pagination.pageSize,
-        current: state.pagination.current
+        // pageSize: state.pagination.pageSize,
+        // current: state.pagination.current
       };
       loadData(param);
     };
     // 页面加载事件
     onMounted(() => {
       let param = {
-        pageSize: state.pagination.pageSize,
-        current: 1
+        // pageSize: state.pagination.pageSize,
+        // current: 1
       };
       loadData(param);
     });
     return {
       ...toRefs(state),
-      handleTableChange,
       handleEditEvent,
       refEditWrap,
       refViewWrap,

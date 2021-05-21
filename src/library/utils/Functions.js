@@ -20,11 +20,21 @@ export function TreeToList(tree, children = "children") {
   }, []);
 }
 
+export function TreeCleanEmptyNode(treeList, children = "children") {
+  treeList.forEach(it => {
+    let childrenData = it[children];
+    if (childrenData?.length > 0) {
+      TreeCleanEmptyNode(childrenData, children);
+    } else {
+      delete it[children];
+    }
+  });
+}
 /**
  * 格式化金额
  * @param {金额} val
  */
-export function money(val) {
+export function formatterMoney(val) {
   val = val.toString().replace(/\$|\\,/g, "");
   if (isNaN(val)) {
     val = "0";
@@ -47,7 +57,7 @@ export function money(val) {
 }
 
 /**
- * 正则替换小数点
+ * 限制只能为整数字
  * @param {*} val
  */
 export function limitNumber(val) {
@@ -65,30 +75,28 @@ export function limitNumber(val) {
  * @param {*} typeText 提示信息
  * @param {*} apiHandler API处理事件
  * @param {*} data 事件参数
- * @param {*} callback 回调方法 
+ * @param {*} callback 回调方法
  */
-export function handleSimpleEvent (typeText, apiHandler, data, callback){
+export function handleSimpleEvent(typeText, apiHandler, data, callback) {
   //alert(apiHandler);
   Modal.confirm({
     title: `确认想${typeText}这条记录吗?`,
     icon: createVNode(DownOutlined),
-    content:
-      "当点击确认按键后, 将该请求提交到后台进行处理.",
+    content: "当点击确认按键后, 将该请求提交到后台进行处理.",
     onOk() {
       // return new Promise((resolve, reject) => {
       //   setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
       // }).catch(() => console.log("Oops errors!"));
-      apiHandler(data).then(res=>{
-        if(res.code == 0){
+      apiHandler(data).then(res => {
+        if (res.code == 0) {
           notification["success"]({
             message: "数据处理成功",
             description: "正在为您刷新当前页面数据.请稍后",
-            onClose: ()=>{
-              if(typeof(callback) == "function" )
-                callback();
+            onClose: () => {
+              if (typeof callback == "function") callback();
             }
           });
-        }else{
+        } else {
           notification["warning"]({
             message: "数据处理异常",
             description: "." + res.msg
@@ -98,7 +106,7 @@ export function handleSimpleEvent (typeText, apiHandler, data, callback){
     },
     onCancel() {}
   });
-};
+}
 
 /**
  * 处理响应结果

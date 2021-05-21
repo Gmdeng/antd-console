@@ -75,11 +75,12 @@ import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
 export default defineComponent({
   name: "ModuleForm",
   setup() {
-    // 接口
+    /*** 上层接口==============================================*/
     const interEvtSubmit = inject("interEvtSubmit");
     const interEvtReset = inject("interEvtReset");
     const interData = inject("interData");
     const interEvtCloseLoad = inject("interEvtCloseLoad");
+    /*** 接口============================================== end */
     // Vue2.0中 data 定义变量名称
     const state = reactive({
       operateList: [
@@ -92,15 +93,14 @@ export default defineComponent({
       ],
       dsTreeData: []
     });
-    // 
+    //
     moduleApi.getTreeSelects().then(res => {
-      if( res.code == 0){
-        state.dsTreeData =[];
+      if (res.code == 0) {
+        state.dsTreeData = [];
         state.dsTreeData.push(res.data);
         //alert(JSON.stringify(res.data));
-        
       }
-    })
+    });
     // 表单绑定数据
     const frmModel = reactive({
       id: "", // ID
@@ -114,11 +114,31 @@ export default defineComponent({
       operate: [32], // 权限
       remarks: "" // 描述
     });
+    const validateCode = async (rule, value) => {
+      let ret = await moduleApi.getModulesByCode(value);
+      if (ret.code == 0) {
+        let dataList = ret.data;
+        // alert(dataList.length);
+        if (dataList.length == 0) {
+          return Promise.resolve();
+        } else if (dataList.length > 0 && frmModel.id == "") {
+          return Promise.reject("该编码已经被占用");
+        } else if (
+          dataList.length > 0 &&
+          frmModel.id != "" &&
+          dataList[0].id != frmModel.id
+        ) {
+          return Promise.reject("该编码已经被占用");
+        }
+      }
+      return Promise.resolve();
+    };
+    // 表单验证
     const rulesRef = reactive({
       name: [
         {
           required: true,
-          message: "请输入角色名称"
+          message: "请输入模块名称"
         }
       ],
       parentId: [
@@ -130,7 +150,10 @@ export default defineComponent({
       code: [
         {
           required: true,
-          message: "请输入角色编码"
+          message: "请输入角模块编码"
+        },
+        {
+          validator: validateCode
         }
       ],
       idx: [
@@ -159,13 +182,16 @@ export default defineComponent({
       ]
     });
     // 表单
-    const { resetFields, validate, validateInfos } = useForm(frmModel, rulesRef );
+    const { resetFields, validate, validateInfos } = useForm(
+      frmModel,
+      rulesRef
+    );
 
     // 调用上级接口
     interEvtSubmit(async () => {
       try {
         let data = await validate();
-        console.log(toRaw(frmModel));
+        // console.log(toRaw(frmModel));
         console.log(data);
         let result = await moduleApi.saveData(toRaw(frmModel));
         return handleHttpResut(result);
@@ -174,8 +200,8 @@ export default defineComponent({
         return false;
       }
     });
+    // 重置表单事件
     interEvtReset(async () => {
-      
       resetFields();
     });
     // 初始化表单
@@ -183,15 +209,13 @@ export default defineComponent({
       moduleApi.getFormData(frmModel.id).then(res => {
         if (res.code == 0) {
           Object.assign(frmModel, res.data);
-          // 
+          //
           interEvtCloseLoad();
         }
       });
     };
     // 加载初始化数据
     onMounted(() => {
-      // console.info("onMounted...." + interData.value);
-      //console.info(JSON.stringify(interData.value));
       if (interData.value == undefined) {
         frmModel.id = null;
         interEvtCloseLoad();
