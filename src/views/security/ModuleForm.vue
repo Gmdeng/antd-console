@@ -70,6 +70,7 @@ import {
 } from "vue";
 
 import moduleApi from "@/api/moduleApi";
+import validatorApi from "@/api/validatorApi";
 import { useForm } from "@ant-design-vue/use";
 import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
 export default defineComponent({
@@ -115,19 +116,12 @@ export default defineComponent({
       remarks: "" // 描述
     });
     const validateCode = async (rule, value) => {
-      let ret = await moduleApi.getModulesByCode(value);
+      let ret = await validatorApi.getModulesByCode(value);
       if (ret.code == 0) {
-        let dataList = ret.data;
-        // alert(dataList.length);
-        if (dataList.length == 0) {
-          return Promise.resolve();
-        } else if (dataList.length > 0 && frmModel.id == "") {
-          return Promise.reject("该编码已经被占用");
-        } else if (
-          dataList.length > 0 &&
-          frmModel.id != "" &&
-          dataList[0].id != frmModel.id
-        ) {
+        return Promise.resolve();
+      } else {
+        let id = ret.data;
+        if (frmModel.id == "" || id != frmModel.id) {
           return Promise.reject("该编码已经被占用");
         }
       }
