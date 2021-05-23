@@ -36,32 +36,22 @@
         </a-form-item>
         <a-form-item label="权限">
           <a-table
-            defaultExpandAllRows="true"
+            :defaultExpandAllRows="false"
             :pagination="false"
             :row-key="record => record.id"
-            :data-source="dataList"
+            :data-source="menuList"
           >
             <a-table-column key="name" title="名称" data-index="name" />
-            <a-table-column key="operate" title="权限" data-index="operate">
-              <template #default="{ record }">
-                <a-checkbox-group
-                  v-model:value="frmModel.permissions[record.id]"
-                >
-                  <span v-for="(it, k) in operateList" :key="k">
-                    <a-checkbox
-                      :value="it.value"
-                      v-if="(record.operate & it.value) == it.value"
-                      >{{ it.label }}</a-checkbox
-                    >
-                  </span>
-                </a-checkbox-group>
-              </template>
+            <a-table-column key="actions" title="权限" data-index="actions">
             </a-table-column>
           </a-table>
         </a-form-item>
       </a-form>
     </a-col>
-    <a-col :sm="24" :md="12" :xl="12"> {{ frmModel.permissions }}</a-col>
+    <a-col :sm="24" :md="12" :xl="12"> {{ frmModel.permissions }}
+      <hr/>
+      {{menuList}}
+    </a-col>
   </a-row>
 </template>
 <script>
@@ -74,6 +64,7 @@ import {
   toRefs
 } from "vue";
 import roleApi from "@/api/roleApi";
+import validatorApi from "@/api/validatorApi";
 import { useForm } from "@ant-design-vue/use";
 import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
 export default defineComponent({
@@ -88,45 +79,7 @@ export default defineComponent({
     // 定义变量名称
     const state = reactive({
       form_mod: "EDIT", // 操作
-      dataList: [
-        {
-          id: 1,
-          name: "权限管理",
-          operate: 1,
-          children: [
-            { id: 2, name: "模块", operate: 10 },
-            { id: 3, name: "角色", operate: 9 },
-            {
-              id: 4,
-              name: "用户",
-              operate: 3,
-              children: [
-                { id: 2, name: "模块", operate: 10 },
-                { id: 3, name: "角色", operate: 9 }
-              ]
-            }
-          ]
-        },
-        {
-          id: 10,
-          name: "订单管理",
-          operate: 1,
-          children: [
-            { id: 12, name: "模块", operate: 10 },
-            { id: 13, name: "角色", operate: 9 },
-            { id: 14, name: "用户", operate: 3 }
-          ]
-        },
-        {
-          id: 20,
-          name: "商品管理",
-          operate: 1,
-          children: [
-            { id: 22, name: "模块", operate: 10 },
-            { id: 23, name: "角色", operate: 9 },
-            { id: 24, name: "用户", operate: 3 }
-          ]
-        }
+      menuList: [
       ],
       operateList: [
         { value: 1, label: "查看" },
@@ -137,28 +90,36 @@ export default defineComponent({
         { value: 32, label: "审核" }
       ]
     });
+    
     // 表单绑定数据
     const frmModel = reactive({
       id: "", // ID
-      code: "code", // 编码
+      code: "", // 编码
       name: "", // 名称
-      idx: "", // 排序
-      notes: "", // 描述,
-      permissions: {
-        1: [],
-        2: [],
-        3: [],
-        4: [],
-        10: [],
-        12: [],
-        13: [],
-        14: [],
-        20: [],
-        22: [],
-        23: [],
-        24: []
+      idx: 0, // 排序
+      notes: "" // 描述
+    });
+    
+    // 获取所有菜单
+    roleApi.getAllMenus().then(res=>{
+      if(res.code== 0){
+        console.info(res.data);
+        state.menuList = res.data;
       }
     });
+    // 验证编码唯一性
+    const validateCode = async (rule, value) => {
+      let ret = await validatorApi.getCheckRoleUniqueCode(value);
+      if (ret.code == 0) {
+        return Promise.resolve();
+      } else {
+        let id = ret.data;
+        if (frmModel.id == "" || id != frmModel.id) {
+          return Promise.reject("该编码已经被占用");
+        }
+      }
+      return Promise.resolve();
+    };
     // 表单验证
     const rulesRef = reactive({
       name: [
@@ -171,6 +132,10 @@ export default defineComponent({
         {
           required: true,
           message: "请输入角色编码"
+        },
+        {
+          validator: validateCode,
+          trigger: 'change' // blur change
         }
       ],
       idx: [
@@ -180,6 +145,7 @@ export default defineComponent({
         }
       ]
     });
+    
     const { resetFields, validate, validateInfos } = useForm(
       frmModel,
       rulesRef
@@ -212,6 +178,7 @@ export default defineComponent({
         }
       });
     };
+
     // 权限表选择事件
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {

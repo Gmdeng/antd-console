@@ -10,7 +10,6 @@
     destroy-on-close
   >
   <a-spin size="large" tip="Loading..." :spinning="state.spinning">
-    spinning:{{state.spinning}}
     <slot />
    </a-spin>
     <div class="footer" v-if="footerVisible">
@@ -20,7 +19,8 @@
         :loading="state.submitLoading"
         :disabled="state.spinning"
         > {{ okText }} </a-button>
-      &nbsp; <a-button @click="onResetHandle" :disabled="state.spinning">{{ resetText }}</a-button> &nbsp;
+      &nbsp;
+       <!-- <a-button @click="onResetHandle" :disabled="state.spinning">{{ resetText }}</a-button> &nbsp; -->
       <a-button @click="onClose" style="float:right">{{ cancelText }}</a-button>
       &nbsp;
     </div>

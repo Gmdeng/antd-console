@@ -11,6 +11,7 @@
       </template>
     </a-page-header>
   </div>
+  {{operateList}}
   <!-- 头部内容end -->
   <div class="gm-container">
     <a-spin :spinning="loading" style="width: 100%">
@@ -119,14 +120,7 @@ export default {
       formTitle: "",
       loading: true,
       dataList: [],
-      operateList: {
-        ADD: { key: 1, text: "增加", color: "red" },
-        MODIFY: { key: 2, text: "修改", color: "blue" },
-        DELETE: { key: 4, text: "删除", color: "gold" },
-        CANCEL: { key: 8, text: "取消", color: "red" },
-        AUDIT: { key: 16, text: "审核", color: "green" },
-        VIEW: { key: 32, text: "查看", color: "blue" }
-      }
+      operateList: []
     });
 
     // 编辑事件
@@ -175,6 +169,9 @@ export default {
           //alert(err);
           state.loading = false;
         });
+      moduleApi.getAllActions().then(res=>{
+        state.operateList = res.data;
+      })
     };
     // 刷新页面
     const refreshPage = () => {

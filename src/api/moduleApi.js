@@ -72,5 +72,13 @@ export default {
    */
   getTreeSelects() {
     return Axios.get(`${BASE_URL}/getTreeSelects`);
+  },
+
+  /**
+   * 
+   * @returns 
+   */
+  getAllActions() {
+    return Axios.get(`${BASE_URL}/getAllActions`);
   }
 };

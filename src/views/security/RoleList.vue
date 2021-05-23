@@ -3,7 +3,7 @@
     <a-page-header
       class="demo-page-header"
       style="border: 1px solid rgb(235, 237, 240)"
-      title="模块管理"
+      title="角色管理"
       sub-title="这是一个小标题This is a subtitle"
     >
       <template #extra>

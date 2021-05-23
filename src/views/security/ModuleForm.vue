@@ -84,17 +84,10 @@ export default defineComponent({
     /*** 接口============================================== end */
     // Vue2.0中 data 定义变量名称
     const state = reactive({
-      operateList: [
-        { value: 1, label: "增加" },
-        { value: 2, label: "修改" },
-        { value: 4, label: "删除" },
-        { value: 8, label: "取消" },
-        { value: 16, label: "审核" },
-        { value: 32, label: "查看" }
-      ],
+      operateList: [],
       dsTreeData: []
     });
-    //
+    //获取父级选项
     moduleApi.getTreeSelects().then(res => {
       if (res.code == 0) {
         state.dsTreeData = [];
@@ -102,6 +95,18 @@ export default defineComponent({
         //alert(JSON.stringify(res.data));
       }
     });
+    //获取操作项
+    moduleApi.getAllActions().then(res => {
+      if (res.code == 0) {
+        //let jsonDatas = JSON.parse(JSON.stringify(res.data));
+        let jsonDatas = res.data;
+        for(let k in jsonDatas){
+          let json = { value: k*1, label: jsonDatas[k] };
+          state.operateList.push(json);
+        }
+      }
+    })
+     
     // 表单绑定数据
     const frmModel = reactive({
       id: "", // ID
@@ -115,12 +120,15 @@ export default defineComponent({
       operate: [32], // 权限
       remarks: "" // 描述
     });
+    // 验证编码唯一性
     const validateCode = async (rule, value) => {
-      let ret = await validatorApi.getModulesByCode(value);
+      let ret = await validatorApi.getCheckModuleUniqueCode(value);
       if (ret.code == 0) {
         return Promise.resolve();
       } else {
         let id = ret.data;
+        console.info("frmModel.id == " + (frmModel.id == ""));
+        console.info("frmModel.id == " + ( id != frmModel.id));
         if (frmModel.id == "" || id != frmModel.id) {
           return Promise.reject("该编码已经被占用");
         }
@@ -138,7 +146,8 @@ export default defineComponent({
       parentId: [
         {
           required: true,
-          message: "请选择上级目录"
+          message: "请选择上级目录",
+          type: 'number'
         }
       ],
       code: [
@@ -147,13 +156,14 @@ export default defineComponent({
           message: "请输入角模块编码"
         },
         {
-          validator: validateCode
+          validator: validateCode //          trigger: 'blur' // blur change
         }
       ],
       idx: [
         {
           required: true,
-          message: "请输入排序"
+          message: "请输入排序",
+          type: 'number'
         }
       ],
       type: [
@@ -171,10 +181,12 @@ export default defineComponent({
       operate: [
         {
           required: false,
-          message: "请输入类型"
+          message: "请输入类型",
+          type: 'array'
         }
       ]
     });
+    
     // 表单
     const { resetFields, validate, validateInfos } = useForm(
       frmModel,
@@ -218,6 +230,7 @@ export default defineComponent({
         initFormData();
       }
     });
+    // 暴露方法和属性
     return {
       ...toRefs(state),
       labelCol: { span: 4 },
