@@ -1,7 +1,7 @@
 <template>
-  <a-row :gutter="24">
-    <a-col :sm="12" :md="12" :xl="12">
-      <a-form :label-col="labelCol" :wrapper-col="wrapperCol">
+  <a-form :label-col="labelCol" :wrapper-col="wrapperCol">
+    <a-row :gutter="24">
+      <a-col :sm="12" :md="12" :xl="12">
         <a-form-item label="编码" v-if="form_mod == 'EDIT'">
           {{ frmModel.code }}
         </a-form-item>
@@ -34,25 +34,29 @@
             :maxlength="100"
           />
         </a-form-item>
-        <a-form-item label="权限">
-          <a-table
-            :defaultExpandAllRows="false"
-            :pagination="false"
-            :row-key="record => record.id"
-            :data-source="menuList"
-          >
-            <a-table-column key="name" title="名称" data-index="name" />
-            <a-table-column key="actions" title="权限" data-index="actions">
-            </a-table-column>
-          </a-table>
-        </a-form-item>
-      </a-form>
-    </a-col>
-    <a-col :sm="24" :md="12" :xl="12"> {{ frmModel.permissions }}
-      <hr/>
-      {{menuList}}
-    </a-col>
-  </a-row>
+      </a-col>
+      <a-col :sm="24" :md="12" :xl="12">
+        {{ frmModel.permissions }}
+        <hr />
+        <a-table
+          :defaultExpandAllRows="true"
+          :pagination="false"
+          :row-key="record => record.id"
+          :data-source="menuList"
+        >
+          <a-table-column key="name" title="名称" data-index="name" />
+          <a-table-column key="acts" title="权限" data-index="acts">
+            <template #default="{ record }">
+              <a-checkbox-group
+                v-model:value="frmModel.permissions[record.id]"
+                :options="record.notes"
+              />
+            </template>
+          </a-table-column>
+        </a-table>
+      </a-col>
+    </a-row>
+  </a-form>
 </template>
 <script>
 import {
@@ -66,7 +70,12 @@ import {
 import roleApi from "@/api/roleApi";
 import validatorApi from "@/api/validatorApi";
 import { useForm } from "@ant-design-vue/use";
-import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
+import {
+  limitNumber,
+  handleHttpResut,
+  TreeCleanEmptyNode,
+  TreeToList
+} from "@/library/utils/Functions";
 export default defineComponent({
   name: "RoleForm",
   setup() {
@@ -79,32 +88,29 @@ export default defineComponent({
     // 定义变量名称
     const state = reactive({
       form_mod: "EDIT", // 操作
-      menuList: [
-      ],
-      operateList: [
-        { value: 1, label: "查看" },
-        { value: 2, label: "增加" },
-        { value: 4, label: "修改" },
-        { value: 8, label: "删除" },
-        { value: 16, label: "取消" },
-        { value: 32, label: "审核" }
-      ]
+      menuList: []
     });
-    
+
     // 表单绑定数据
     const frmModel = reactive({
       id: "", // ID
       code: "", // 编码
       name: "", // 名称
       idx: 0, // 排序
-      notes: "" // 描述
+      notes: "", // 描述,
+      permissions: {}
     });
-    
+
     // 获取所有菜单
-    roleApi.getAllMenus().then(res=>{
-      if(res.code== 0){
+    roleApi.getAllMenus().then(res => {
+      if (res.code == 0) {
         console.info(res.data);
         state.menuList = res.data;
+        TreeCleanEmptyNode(state.menuList);
+        let list = TreeToList(res.data);
+        list.forEach(it => {
+          frmModel.permissions[it.id] = [];
+        });
       }
     });
     // 验证编码唯一性
@@ -135,7 +141,7 @@ export default defineComponent({
         },
         {
           validator: validateCode,
-          trigger: 'change' // blur change
+          trigger: "change" // blur change
         }
       ],
       idx: [
@@ -145,7 +151,7 @@ export default defineComponent({
         }
       ]
     });
-    
+
     const { resetFields, validate, validateInfos } = useForm(
       frmModel,
       rulesRef
@@ -164,6 +170,7 @@ export default defineComponent({
         return false;
       }
     });
+
     // 重置表单事件
     interEvtReset(async () => {
       resetFields();
@@ -179,27 +186,6 @@ export default defineComponent({
       });
     };
 
-    // 权限表选择事件
-    const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(
-          `selectedRowKeys: ${selectedRowKeys}`,
-          "selectedRows: ",
-          selectedRows
-        );
-      },
-      onSelect: (record, selected, selectedRows) => {
-        console.log("onSelect:", record, selected, selectedRows);
-      },
-      onSelectAll: (selected, selectedRows, changeRows) => {
-        console.log(
-          "onSelectAll",
-          selected,
-          selectedRows,
-          JSON.stringify(changeRows)
-        );
-      }
-    };
     // 加载初始化数据
     onMounted(() => {
       if (interData.value == undefined) {
@@ -218,8 +204,7 @@ export default defineComponent({
       wrapperCol: { span: 14 },
       limitNumber,
       frmModel,
-      validateInfos,
-      rowSelection
+      validateInfos
     };
   }
 });

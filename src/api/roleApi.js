@@ -4,7 +4,6 @@ import Axios from "@/library/Axios";
  */
 const BASE_URL = "/admin/system/role";
 export default {
-
   /**
    * 获取所有菜单
    */
@@ -15,7 +14,7 @@ export default {
    * 分页获取数据列表
    */
   getDataListByPage(params) {
-    // console.info(JSON.stringify(params));
+    console.info(JSON.stringify(params));
     return Axios.get(`${BASE_URL}/getList`);
   },
   /**
