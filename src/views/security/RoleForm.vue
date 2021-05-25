@@ -181,6 +181,7 @@ export default defineComponent({
       roleApi.getDetail(frmModel.id).then(res => {
         if (res.code == 0) {
           Object.assign(frmModel, res.data);
+          //Object.assign(frmModel.permissions)
           interEvtCloseLoad();
         }
       });
