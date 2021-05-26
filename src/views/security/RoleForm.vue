@@ -98,7 +98,12 @@ export default defineComponent({
       name: "", // 名称
       idx: 0, // 排序
       notes: "", // 描述,
-      permissions: {}
+      permissions: {},
+      perms: ["ADD", "EDIT", "AUDIT"],
+      hasPerms: [
+        { id: 201, name: "ricky", age: 29 },
+        { id: 202, name: "tester", age: 309 }
+      ]
     });
 
     // 获取所有菜单
