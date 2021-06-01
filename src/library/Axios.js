@@ -2,12 +2,11 @@
  * 封装axios请求
  *  params是添加到url的请求字符串中的，用于get请求,例如shinyway.com?key=params
  *  而data是添加到请求体（body）中的， 用于post请求,传递参数
- * 
-// console.info(JSON.stringify(process.env))
-// axios.defaults.headers.common['Authorization'] = ''
-// axios.defaults.transformRequest =[obj=> qs.stringify(obj)]
+ * console.info(JSON.stringify(process.env))
+ * axios.defaults.headers.common['Authorization'] = ''
+ * axios.defaults.transformRequest =[obj=> qs.stringify(obj)]
  *
-  */
+ */
 import axios from "axios";
 import store from "@/store/index";
 import qs from "qs";
@@ -40,8 +39,47 @@ const instance = axios.create({
   withCredentials: true,
   crossDomain: true,
   headers: {
-    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8;",
-    "X-Requested-With": "XMLHttpRequest"
+    common: {
+      Accept: "application/json, text/plain, */*",
+      "X-Requested-With": "XMLHttpRequest"
+    },
+    delete: {
+      // 用来删除服务器的资源
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8;"
+    },
+    head: {
+      // 安全、幂等；
+      // 与get方法类似，但不返回message body内容，仅仅是获得获取资源的部分信息（content-type、content-length）；
+      // restful框架中较少使用
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8;"
+    },
+    get: {
+      // 安全、幂等；
+      // 用于获取资源；用来查询数据，不对服务器的数据做任何的修改，新增，删除等操作...
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8;"
+    },
+    post: {
+      // 非安全、非幂等；
+      // 用于创建子资源, 用来数据的提交，新增操作..
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    put: {
+      // 非安全、非幂等；
+      // 用于创建子资源, 用来数据的提交，新增操作..
+      // put请求与post一样都会改变服务器的数据，但是put的侧重点在于对于数据的修改操作，但是post侧重于对于数据的增加
+      "Content-Type": "application/json;charset=utf-8"
+    },
+    patch: {
+      // 非安全、幂等；
+      // 用于创建、更新资源，于PUT类似，区别在于PATCH代表部分更新；
+      // 后来提出的接口方法，使用时可能去要验证客户端和服务端是否支持；
+      // PATCH是最新的 HTTP verb被推荐用于 已知资源进行局部更新
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    OPTIONS: {
+      // 安全、幂等；
+      // 用于url验证，验证接口服务是否正常；
+    }
   },
   timeout: 5000, // 超时时间
   retry: 4, //请求次数
@@ -52,13 +90,18 @@ const instance = axios.create({
 instance.interceptors.request.use(
   request => {
     const { headers, method, params } = request;
-
+    console.info("headers: " + JSON.stringify(headers));
+    console.info("method:  " + method);
+    console.info("params:  " + params);
+    // 设置授权的TOKEN
     if (store.getters["auth/accessToken"]) {
       headers["AuthorizationToken"] = store.getters["auth/accessToken"];
     }
+
     // 过滤空参数
     if (params) {
       const keys = Object.keys(params);
+      console.info("Keys:" + keys);
       for (let key of keys) {
         const value = params[key];
         switch (value) {
@@ -71,17 +114,25 @@ instance.interceptors.request.use(
       }
     }
     // 判断为post请求，序列化传来的参数
-    if (method === "post" || method === "put" || method === "delete") {
-      // a[0].id=12&a[1].name=ricky
-      //config.data = qs.stringify(config.data, {arrayFormat: "indices", allowDots: true});
-      // // id[0]=12&id[1]=333
-      // config.data = qs.stringify(config.data, {arrayFormat: "brackets"});
-      // // id=12&id=333
+    if (method === "post" || method === "delete") {
       request.data = qs.stringify(request.data, {
-        arrayFormat: "repeat",
+        arrayFormat: "repeat", // ids=1&ids=2
         allowDots: true
       });
-      //config.data = qs.stringify(config.data);
+    } else if (method === "put") {
+      request.paramsSerializer = params => {
+        return qs.stringify(params, {
+          arrayFormat: "indices", // ids[0]=1&ids[1]=2
+          allowDots: true // a[0].id=12&a[1].name=ricky
+        });
+      };
+    } else if (method === "patch") {
+      request.paramsSerializer = params => {
+        return qs.stringify(params, {
+          arrayFormat: "brackets", // // id[0]=12&id[1]=333
+          allowDots: true
+        });
+      };
     }
     return request;
   },

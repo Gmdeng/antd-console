@@ -25,7 +25,7 @@
         </a-col>
       </a-row>
     </a-page-header>
-
+    <DTimeline></DTimeline>
     <a-page-header
       style="border: 1px solid rgb(235, 237, 240)"
       title="Title"
@@ -181,10 +181,12 @@ import {
 } from "vue";
 import { DropboxOutlined } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
+import { DTimeline } from "@/components";
 export default {
   name: "Home",
   components: {
-    DropboxOutlined
+    DropboxOutlined,
+    DTimeline
   },
   setup() {
     const { ctx } = getCurrentInstance();

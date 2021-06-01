@@ -9,22 +9,23 @@
     @close="onClose"
     destroy-on-close
   >
-  <a-spin size="large" tip="Loading..." :spinning="state.spinning">
-    <slot />
-   </a-spin>
+    <a-spin size="large" tip="Loading..." :spinning="state.spinning">
+      <slot />
+    </a-spin>
     <div class="footer" v-if="footerVisible">
       <a-button
         type="primary"
         @click="onSubmitHandle"
         :loading="state.submitLoading"
         :disabled="state.spinning"
-        > {{ okText }} </a-button>
+      >
+        {{ okText }}
+      </a-button>
       &nbsp;
-       <!-- <a-button @click="onResetHandle" :disabled="state.spinning">{{ resetText }}</a-button> &nbsp; -->
+      <!-- <a-button @click="onResetHandle" :disabled="state.spinning">{{ resetText }}</a-button> &nbsp; -->
       <a-button @click="onClose" style="float:right">{{ cancelText }}</a-button>
       &nbsp;
     </div>
- 
   </a-drawer>
 </template>
 <script>
@@ -84,14 +85,17 @@ export default defineComponent({
       }
     });
     // 观察
-    watch(() => state.visible, (newValue, oldValue) => {
-          //alert(newValue +" === "+ oldValue);
-      // 因为watch被观察的对象只能是getter/effect函数、ref、热active对象或者这些类型是数组
-      // 所以需要将state.count变成getter函数
-      if(newValue == false && oldValue == true){
-        state.spinning = true;
+    watch(
+      () => state.visible,
+      (newValue, oldValue) => {
+        //alert(newValue +" === "+ oldValue);
+        // 因为watch被观察的对象只能是getter/effect函数、ref、热active对象或者这些类型是数组
+        // 所以需要将state.count变成getter函数
+        if (newValue == false && oldValue == true) {
+          state.spinning = true;
+        }
       }
-    });
+    );
     // 方法
     const Open = data => {
       state.visible = true;
@@ -117,8 +121,8 @@ export default defineComponent({
         state.onResetEvent = process;
       }
     });
-    provide("interEvtCloseLoad", ()=> {
-      state.spinning = false
+    provide("interEvtCloseLoad", () => {
+      state.spinning = false;
     });
     /*==操作处理事件==================================== */
 
