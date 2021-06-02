@@ -62,6 +62,17 @@
         </a-table-column>
       </a-table>
     </a-spin>
+    <a-button @click="clickPostArrayEvt">clickPostArrayEvt 提交数组</a-button>
+    <a-button @click="clickPostListEvt">clickPostListEvt 提交列表接收</a-button>
+    <a-button @click="clickPostBeanListEvt">
+      clickPostBeanListEvt 提交对象列表
+    </a-button>
+    <a-button @click="clickPostBeanOneEvt">
+      clickPostBeanOneEvt 提交数组
+    </a-button>
+    <a-button @click="clickPostBeanMoreEvt">
+      clickPostBeanMoreEvt 提交数组
+    </a-button>
   </div>
   <d-drawer :title="formTitle" ref="refEditWrap" :refreshParent="refreshPage">
     <role-form></role-form>
@@ -114,7 +125,59 @@ export default {
         VIEW: { key: 32, text: "查看", color: "blue" }
       }
     });
-
+    // 提交数组
+    const clickPostArrayEvt = () => {
+      let frmData = { ids: ["22", "33", "DDD"] };
+      roleApi.postAarry(frmData).then(res => {
+        alert(JSON.stringify(res));
+      });
+    };
+    // 提交列表接收
+    const clickPostListEvt = () => {
+      let frmData = { ids: ["22", "33", "DDD"] };
+      roleApi.postList(frmData).then(res => {
+        alert(JSON.stringify(res));
+      });
+    };
+    // 提交列表接收
+    const clickPostBeanListEvt = () => {
+      let frmData = { ids: ["22", "33", "DDD"] };
+      roleApi.postList(frmData).then(res => {
+        alert(JSON.stringify(res));
+      });
+    };
+    // 提交列表接收
+    const clickPostBeanOneEvt = () => {
+      let frmData = {
+        id: 98,
+        name: "什么东西",
+        code: "GD-GEGGGE",
+        idx: 678,
+        perms: ["22", "33", "DDD"],
+        pertion: { id: 10001, name: "小明和小强", age: 957 }
+      };
+      roleApi.postBeanOne(frmData).then(res => {
+        alert(JSON.stringify(res));
+      });
+    };
+    // 提交列表接收
+    const clickPostBeanMoreEvt = () => {
+      let frmData = {
+        id: 98,
+        name: "什么东西",
+        code: "GD-GEGGGE",
+        idx: 678,
+        perms: ["22", "33", "DDD"],
+        pertion: { id: 10001, name: "小明和小强", age: 957 },
+        hasPerms: [
+          { id: 10003, name: "小明AAAA", age: 957 },
+          { id: 10005, name: "小强BBBB", age: 957 }
+        ]
+      };
+      roleApi.postBeanMore(frmData).then(res => {
+        alert(JSON.stringify(res));
+      });
+    };
     // 编辑事件
     const handleEditEvent = (type, data) => {
       if (type == "ADD") {
@@ -195,7 +258,12 @@ export default {
     return {
       ...toRefs(state),
       handleTableChange,
+      clickPostBeanMoreEvt,
+      clickPostBeanOneEvt,
+      clickPostBeanListEvt,
       handleEditEvent,
+      clickPostListEvt,
+      clickPostArrayEvt,
       refEditWrap,
       refViewWrap,
       refreshPage

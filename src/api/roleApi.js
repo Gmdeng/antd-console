@@ -25,9 +25,30 @@ export default {
   },
   /**
    * 获取明细
-   * @param {ID} id
+   * @param {*} id
    */
   getDetail(id) {
     return Axios.get(`${BASE_URL}/getDetail?id=${id}`);
+  },
+  /**
+   * 保存
+   */
+  postAarry(formData) {
+    return Axios.post(`${BASE_URL}/postAarry`, formData);
+  },
+  postList(formData) {
+    return Axios.put(`${BASE_URL}/postList`, formData);
+  },
+  postBeanList(formData) {
+    return Axios.post(`${BASE_URL}/postBeanList`, formData);
+  },
+  postBeanOne(formData) {
+    return Axios.post(`${BASE_URL}/postBeanOne`, formData);
+  },
+  postBeanMore(formData) {
+    return Axios.put(`${BASE_URL}/postBeanMore`, formData);
+  },
+  postBeanArray(formData) {
+    return Axios.post(`${BASE_URL}/postBeanArray`, formData);
   }
 };
