@@ -62,16 +62,27 @@
         </a-table-column>
       </a-table>
     </a-spin>
-    <a-button @click="clickPostArrayEvt">clickPostArrayEvt 提交数组</a-button>
-    <a-button @click="clickPostListEvt">clickPostListEvt 提交列表接收</a-button>
+    <a-button @click="clickPostArrayEvt">
+      clickPostArrayEvt 提交数组-OK
+    </a-button>
+    <a-button @click="clickPostListEvt">
+      clickPostListEvt 提交列表接收-OK
+    </a-button>
     <a-button @click="clickPostBeanListEvt">
-      clickPostBeanListEvt 提交对象列表
+      clickPostBeanListEvt 提交对象列表 -Ok
     </a-button>
     <a-button @click="clickPostBeanOneEvt">
-      clickPostBeanOneEvt 提交数组
+      clickPostBeanOneEvt 提交数组 -Ok
     </a-button>
     <a-button @click="clickPostBeanMoreEvt">
-      clickPostBeanMoreEvt 提交数组
+      clickPostBeanMoreEvt 提交数组 -OK
+    </a-button>
+
+    <a-button @click="clickPostRulesEvt">
+      clickPostRulesEvt 提交数组 - OK
+    </a-button>
+    <a-button @click="clickPostBeanArryEvt">
+      clickPostBeanArryEvt 提交数组 - test
     </a-button>
   </div>
   <d-drawer :title="formTitle" ref="refEditWrap" :refreshParent="refreshPage">
@@ -134,15 +145,18 @@ export default {
     };
     // 提交列表接收
     const clickPostListEvt = () => {
-      let frmData = { ids: ["22", "33", "DDD"] };
+      let frmData = { ids: ["List", "22", "33", "DDD"] };
       roleApi.postList(frmData).then(res => {
         alert(JSON.stringify(res));
       });
     };
     // 提交列表接收
     const clickPostBeanListEvt = () => {
-      let frmData = { ids: ["22", "33", "DDD"] };
-      roleApi.postList(frmData).then(res => {
+      let frmData = [
+        { value: "22", label: "BB" },
+        { value: "23", label: "BC" }
+      ];
+      roleApi.postBeanList(frmData).then(res => {
         alert(JSON.stringify(res));
       });
     };
@@ -175,6 +189,42 @@ export default {
         ]
       };
       roleApi.postBeanMore(frmData).then(res => {
+        alert(JSON.stringify(res));
+      });
+    };
+
+    // 提交列表接收
+    const clickPostRulesEvt = () => {
+      let frmData = {
+        listName: "面食",
+        age: ["21", "22", "23", "24"],
+        person: {
+          operate: "人在",
+          value: ["21", "22", "23", "24"],
+          column: "age"
+        },
+        rules: [
+          { operate: "大于", value: ["21", "22", "23", "24"], column: "age" },
+          { operate: "特于", value: ["51", "52", "53"], column: "testing" }
+        ]
+      };
+      roleApi.postRules(frmData).then(res => {
+        alert(JSON.stringify(res));
+      });
+    };
+    // 提交列表接收
+    const clickPostBeanArryEvt = () => {
+      // let frmData = {
+      //   arry: [
+      //     { value: "22", label: "BB" },
+      //     { value: "23", label: "BC" }
+      //   ]
+      // };
+      let frmData = [
+        { value: "22", label: "BB" },
+        { value: "23", label: "BC" }
+      ];
+      roleApi.postBeanArry(frmData).then(res => {
         alert(JSON.stringify(res));
       });
     };
@@ -258,6 +308,8 @@ export default {
     return {
       ...toRefs(state),
       handleTableChange,
+      clickPostBeanArryEvt,
+      clickPostRulesEvt,
       clickPostBeanMoreEvt,
       clickPostBeanOneEvt,
       clickPostBeanListEvt,

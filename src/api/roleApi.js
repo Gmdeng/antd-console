@@ -37,10 +37,10 @@ export default {
     return Axios.post(`${BASE_URL}/postAarry`, formData);
   },
   postList(formData) {
-    return Axios.put(`${BASE_URL}/postList`, formData);
+    return Axios.post(`${BASE_URL}/postList`, formData);
   },
   postBeanList(formData) {
-    return Axios.post(`${BASE_URL}/postBeanList`, formData);
+    return Axios.put(`${BASE_URL}/postBeanList`, formData);
   },
   postBeanOne(formData) {
     return Axios.post(`${BASE_URL}/postBeanOne`, formData);
@@ -48,7 +48,10 @@ export default {
   postBeanMore(formData) {
     return Axios.put(`${BASE_URL}/postBeanMore`, formData);
   },
-  postBeanArray(formData) {
-    return Axios.post(`${BASE_URL}/postBeanArray`, formData);
+  postRules(formData) {
+    return Axios.patch(`${BASE_URL}/postRules`, formData);
+  },
+  postBeanArry(formData) {
+    return Axios.patch(`${BASE_URL}/postBeanArry`, formData);
   }
 };

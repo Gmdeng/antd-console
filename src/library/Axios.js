@@ -30,6 +30,7 @@ const HttpCodeMessage = {
   503: "服务不可用，服务器暂时过载或维护。",
   504: "网关超时。"
 };
+
 // 创建axios实例 axiso的一些基础参数配置,
 const instance = axios.create({
   // 配置在config/prod.env里的baseApi
@@ -61,7 +62,7 @@ const instance = axios.create({
     post: {
       // 非安全、非幂等；
       // 用于创建子资源, 用来数据的提交，新增操作..
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8;"
     },
     put: {
       // 非安全、非幂等；
@@ -76,7 +77,7 @@ const instance = axios.create({
       // PATCH是最新的 HTTP verb被推荐用于 已知资源进行局部更新
       "Content-Type": "application/x-www-form-urlencoded"
     },
-    OPTIONS: {
+    options: {
       // 安全、幂等；
       // 用于url验证，验证接口服务是否正常；
     }
@@ -90,9 +91,6 @@ const instance = axios.create({
 instance.interceptors.request.use(
   request => {
     const { headers, method, params } = request;
-    console.info("headers: " + JSON.stringify(headers));
-    console.info("method:  " + method);
-    console.info("params:  " + params);
     // 设置授权的TOKEN
     if (store.getters["auth/accessToken"]) {
       headers["AuthorizationToken"] = store.getters["auth/accessToken"];
@@ -114,25 +112,20 @@ instance.interceptors.request.use(
       }
     }
     // 判断为post请求，序列化传来的参数
-    if (method === "post" || method === "delete") {
+    if (method === "post") {
       request.data = qs.stringify(request.data, {
         arrayFormat: "repeat", // ids=1&ids=2
         allowDots: true
       });
     } else if (method === "put") {
-      request.paramsSerializer = params => {
-        return qs.stringify(params, {
-          arrayFormat: "indices", // ids[0]=1&ids[1]=2
-          allowDots: true // a[0].id=12&a[1].name=ricky
-        });
-      };
+      console.info("use put method do it");
     } else if (method === "patch") {
-      request.paramsSerializer = params => {
-        return qs.stringify(params, {
-          arrayFormat: "brackets", // // id[0]=12&id[1]=333
-          allowDots: true
-        });
-      };
+      request.data = qs.stringify(request.data, {
+        // arrayFormat: "brackets", // //brackets ids[]=12&ids[]=333
+        arrayFormat: "indices", // ids[0]=1&ids[1]=2
+        allowDots: true // ids[0].id=12&ids[1].name=ricky
+        // allowDots: false // ids[][id]=12&ids[][name]=ricky
+      });
     }
     return request;
   },
