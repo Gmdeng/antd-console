@@ -21,5 +21,14 @@ export default {
    */
   getCheckRoleUniqueCode(code) {
     return Axios.get(`${BASE_URL}/CheckRoleUniqueCode?code=${code}`);
+  },
+
+  /**
+   * 验证用户名唯一性
+   * @param {用户名} uid
+   * @returns
+   */
+  getCheckUserUniqueUID(uid) {
+    return Axios.get(`${BASE_URL}/CheckUserUniqueUID?uid=${uid}`);
   }
 };

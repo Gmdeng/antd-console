@@ -34,12 +34,13 @@
             :maxlength="100"
           />
         </a-form-item>
+        {{ frmModel }}
       </a-col>
       <a-col :sm="24" :md="12" :xl="12">
-        {{ frmModel.permissions }}
+        {{ permissions }}
         <hr />
         <a-table
-          :defaultExpandAllRows="true"
+          defaultExpandAllRows="true"
           :pagination="false"
           :row-key="record => record.id"
           :data-source="menuList"
@@ -47,8 +48,17 @@
           <a-table-column key="name" title="名称" data-index="name" />
           <a-table-column key="acts" title="权限" data-index="acts">
             <template #default="{ record }">
+              <div :style="{ borderBottom: '1px solid #E9E9E9' }">
+                <a-checkbox
+                  v-model:checked="checkAlls[record.id]"
+                  :indeterminate="indeterminates[record.id]"
+                  @change="onCheckAllChange(record.id)"
+                >
+                  Check all
+                </a-checkbox>
+              </div>
               <a-checkbox-group
-                v-model:value="frmModel.permissions[record.id]"
+                v-model:value="permissions[record.id]"
                 :options="record.notes"
               />
             </template>
@@ -67,6 +77,7 @@ import {
   toRaw,
   toRefs
 } from "vue";
+import { notification } from "ant-design-vue";
 import roleApi from "@/api/roleApi";
 import validatorApi from "@/api/validatorApi";
 import { useForm } from "@ant-design-vue/use";
@@ -74,7 +85,8 @@ import {
   limitNumber,
   handleHttpResut,
   TreeCleanEmptyNode,
-  TreeToList
+  TreeToList,
+  FindTreeNode
 } from "@/library/utils/Functions";
 export default defineComponent({
   name: "RoleForm",
@@ -88,7 +100,11 @@ export default defineComponent({
     // 定义变量名称
     const state = reactive({
       form_mod: "EDIT", // 操作
-      menuList: []
+      menuList: [],
+      optionList: [],
+      checkAlls: {},
+      indeterminates: {},
+      permissions: {}
     });
 
     // 表单绑定数据
@@ -98,12 +114,7 @@ export default defineComponent({
       name: "", // 名称
       idx: 0, // 排序
       notes: "", // 描述,
-      permissions: {},
-      perms: ["ADD", "EDIT", "AUDIT"],
-      hasPerms: [
-        { id: 201, name: "ricky", age: 29 },
-        { id: 202, name: "tester", age: 309 }
-      ]
+      privileges: []
     });
 
     // 获取所有菜单
@@ -112,9 +123,11 @@ export default defineComponent({
         console.info(res.data);
         state.menuList = res.data;
         TreeCleanEmptyNode(state.menuList);
-        let list = TreeToList(res.data);
-        list.forEach(it => {
-          frmModel.permissions[it.id] = [];
+        state.optionList = TreeToList(res.data);
+        state.optionList.forEach(it => {
+          state.checkAlls[it.id] = false;
+          state.indeterminates[it.id] = false;
+          state.permissions[it.id] = [];
         });
       }
     });
@@ -162,12 +175,55 @@ export default defineComponent({
       rulesRef
     );
 
+    // 处理选中子项
+    const handleCheckedChildren = (childList, flg) => {
+      childList.forEach(it => {
+        state.permissions[it.id] = [];
+        if (flg == true) {
+          it.notes.forEach(item => {
+            state.permissions[it.id].push(item.value);
+          });
+        }
+        //
+        let childrenData = it["children"];
+        console.info(it.id + "-childrenData1=" + childrenData);
+        if (childrenData != undefined && childrenData?.length > 0) {
+          handleCheckedChildren(childrenData, flg);
+        }
+      });
+    };
+    // 全选事件
+    const onCheckAllChange = id => {
+      //alert(state.checkAlls[id]);
+      let selectedNodes = FindTreeNode(state.menuList, id);
+      handleCheckedChildren(selectedNodes, state.checkAlls[id]);
+    };
     // 调用上级接口
     interEvtSubmit(async () => {
       try {
         let data = await validate();
         // console.log(toRaw(frmModel));
         console.log(data);
+        // alert(JSON.stringify(frmModel.permissions));
+        frmModel.privileges = [];
+        for (var key in state.permissions) {
+          // alert(key + "长度==" + frmModel.permissions[key].length);
+          if (state.permissions[key].length > 0) {
+            frmModel.privileges.push({
+              moduleId: key,
+              values: state.permissions[key]
+            });
+          }
+        }
+        // 判断选中的模块权限
+        if (frmModel.privileges.length == 0) {
+          notification["error"]({
+            message: "至少选中一项",
+            description: "模块权限至少选中一项."
+          });
+          return false;
+        }
+        // frmModel.privileges = permissions;
         let result = await roleApi.saveData(toRaw(frmModel));
         return handleHttpResut(result);
       } catch (err) {
@@ -183,10 +239,14 @@ export default defineComponent({
 
     // 初始化表单
     const initFormData = () => {
-      roleApi.getDetail(frmModel.id).then(res => {
+      roleApi.getFormData(frmModel.id).then(res => {
         if (res.code == 0) {
           Object.assign(frmModel, res.data);
-          //Object.assign(frmModel.permissions)
+          Object.assign(state.permissions, frmModel.permissions);
+          //if (frmModel.hasOwnProperty("permissions")) {
+          if (Object.prototype.hasOwnProperty.call(frmModel, "permissions")) {
+            delete frmModel.permissions;
+          }
           interEvtCloseLoad();
         }
       });
@@ -210,7 +270,8 @@ export default defineComponent({
       wrapperCol: { span: 14 },
       limitNumber,
       frmModel,
-      validateInfos
+      validateInfos,
+      onCheckAllChange
     };
   }
 });

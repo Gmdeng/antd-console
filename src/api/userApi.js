@@ -2,14 +2,14 @@ import Axios from "@/library/Axios";
 /**
  * 用户相关接口
  */
-const BASE_URL = "/admin/scy/user";
+ const BASE_URL = "/admin/system/user";
 export default {
   /**
    * 分页获取数据列表
    */
   getDataListByPage(params) {
     console.info(JSON.stringify(params));
-    return Axios.post(`${BASE_URL}/getDataListByPage`);
+    return Axios.get(`${BASE_URL}/getDataListByPage`, params);
   },
   /**
    * 保存

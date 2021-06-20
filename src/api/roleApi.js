@@ -5,6 +5,12 @@ import Axios from "@/library/Axios";
 const BASE_URL = "/admin/system/role";
 export default {
   /**
+   * 获取所有解色名
+   */
+  getAvailableRoleNames() {
+    return Axios.get(`${BASE_URL}/getAvailableRoleNames`);
+  },
+  /**
    * 获取所有菜单
    */
   getAllMenus() {
@@ -15,7 +21,7 @@ export default {
    */
   getDataListByPage(params) {
     console.info(JSON.stringify(params));
-    return Axios.get(`${BASE_URL}/getList`);
+    return Axios.get(`${BASE_URL}/getDataListByPage`, params);
   },
   /**
    * 保存
@@ -31,13 +37,20 @@ export default {
     return Axios.get(`${BASE_URL}/getDetail?id=${id}`);
   },
   /**
+   * 获取表单信息
+   * @param {*} id
+   */
+  getFormData(id) {
+    return Axios.get(`${BASE_URL}/getFormData?id=${id}`);
+  },
+  /**
    * 保存
    */
   postAarry(formData) {
-    return Axios.post(`${BASE_URL}/postAarry`, formData);
+    return Axios.patch(`${BASE_URL}/postAarry`, formData);
   },
   postList(formData) {
-    return Axios.post(`${BASE_URL}/postList`, formData);
+    return Axios.patch(`${BASE_URL}/postList`, formData);
   },
   postBeanList(formData) {
     return Axios.put(`${BASE_URL}/postBeanList`, formData);
@@ -49,9 +62,9 @@ export default {
     return Axios.put(`${BASE_URL}/postBeanMore`, formData);
   },
   postRules(formData) {
-    return Axios.patch(`${BASE_URL}/postRules`, formData);
+    return Axios.post(`${BASE_URL}/postRules`, formData);
   },
   postBeanArry(formData) {
-    return Axios.patch(`${BASE_URL}/postBeanArry`, formData);
+    return Axios.post(`${BASE_URL}/postBeanArry`, formData);
   }
 };

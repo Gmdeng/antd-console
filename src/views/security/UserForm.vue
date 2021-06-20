@@ -1,18 +1,33 @@
 <template>
   <a-row :gutter="24">
     <a-col :sm="24" :md="12" :xl="12">
-      <a-form :label-col="labelCol" :wrapper-col="wrapperCol">
+      <a-form
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+        :scrollToFirstError="true"
+      >
         <a-form-item label="用户名" v-bind="validateInfos.userId">
           <a-input v-model:value="frmModel.userId" placeholder="请输入用户名" />
         </a-form-item>
         <a-form-item label="昵称" v-bind="validateInfos.petName">
           <a-input v-model:value="frmModel.petName" placeholder="请输入昵称" />
         </a-form-item>
-        <a-form-item label="手机号" v-bind="validateInfos.mobile">
-          <a-input v-model:value="frmModel.mobile" placeholder="请输入手机号" />
+        <a-form-item label="手机号" v-bind="validateInfos.mobileNo">
+          <a-input
+            v-model:value="frmModel.mobileNo"
+            placeholder="请输入手机号"
+          />
         </a-form-item>
         <a-form-item label="角色" v-bind="validateInfos.roles">
-          <a-input v-model:value="frmModel.roles" placeholder="请输入角色" />
+          <a-select
+            mode="multiple"
+            placeholder="请选择角色"
+            v-model:value="frmModel.roles"
+          >
+            <a-select-option v-for="it in roleList" :key="it.id">
+              {{ it.name }}
+            </a-select-option>
+          </a-select>
         </a-form-item>
         <a-form-item label="允许登录IP" v-bind="validateInfos.allowIpaddr">
           <a-textarea
@@ -42,6 +57,7 @@
           />
         </a-form-item>
       </a-form>
+      roleList: {{ roleList }}
     </a-col>
   </a-row>
 </template>
@@ -54,85 +70,68 @@ import {
   toRaw,
   toRefs
 } from "vue";
+import userApi from "@/api/userApi";
 import roleApi from "@/api/roleApi";
+import validatorApi from "@/api/validatorApi";
 import { useForm } from "@ant-design-vue/use";
-import { limitNumber } from "@/library/utils/Functions";
+import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
 export default defineComponent({
-  name: "ModuleForm",
+  name: "UserForm",
   setup() {
-    // 接
+    /*** 上层接口==============================================*/
     const interEvtSubmit = inject("interEvtSubmit");
     const interEvtReset = inject("interEvtReset");
     const interData = inject("interData");
-    // Vue2.0中 data 定义变量名称
+    const interEvtCloseLoad = inject("interEvtCloseLoad");
+    /*** 接口============================================== end */
+    // 定义变量名称
     const state = reactive({
-      operateList: [
-        { value: 1, label: "增加" },
-        { value: 2, label: "修改" },
-        { value: 4, label: "删除" },
-        { value: 8, label: "取消" },
-        { value: 16, label: "审核" },
-        { value: 32, label: "查看" }
-      ],
-      dsTreeData: [
-        {
-          title: "根目录", //按照官方文档这里的键值对应该是title 下面就不写注释了
-          value: "0", //按照光放文档这里的键值对应该是value 下面就不写注释了
-          key: "0-0"
-        },
-
-        {
-          title: "Node1", //按照官方文档这里的键值对应该是title 下面就不写注释了
-          value: "1", //按照光放文档这里的键值对应该是value 下面就不写注释了
-          key: "0-1",
-          children: [
-            {
-              title: "Child Node1", //title
-              value: "0-1-1", // value
-              key: "0-1-1"
-            },
-            {
-              title: "Child Node2",
-              value: "0-1-2",
-              key: "0-1-2"
-            }
-          ]
-        },
-        {
-          title: "Node2",
-          value: "2",
-          key: "0-2",
-          children: [
-            {
-              title: "Child Node2-1",
-              value: "0-2-1",
-              key: "0-2-1"
-            },
-            {
-              title: "Child Node2-2",
-              value: "0-2-2",
-              key: "0-2-2"
-            }
-          ]
-        }
-      ]
+      form_mod: "EDIT", // 操作
+      roleList: []
     });
+
     // 表单绑定数据
     const frmModel = reactive({
       id: "", // ID
       userId: "", // 用户名
       petName: "", // 昵称
-      mobile: "", // 手机号
-      roles: "", //角色
+      mobileNo: "", // 手机号
       allowIpaddr: "", // 允许登录IP
       denyIpaddr: "", // 拒绝登录IP
-      notes: "" // 描述
+      notes: "", // 描述,
+      roles: []
     });
+
+    // 获取所有可用的角色
+    roleApi.getAvailableRoleNames().then(res => {
+      if (res.code == 0) {
+        //console.info(res.data);
+        state.roleList = res.data;
+      }
+    });
+    // 验证编码唯一性
+    const validateUserId = async (rule, value) => {
+      let ret = await validatorApi.getCheckUserUniqueUID(value);
+      if (ret.code == 0) {
+        return Promise.resolve();
+      } else {
+        let id = ret.data;
+        if (frmModel.id == "" || id != frmModel.id) {
+          return Promise.reject("该编码已经被占用");
+        }
+      }
+      return Promise.resolve();
+    };
+    // 表单验证
     const rulesRef = reactive({
       userId: [
         {
           required: true,
           message: "请输入用户名"
+        },
+        {
+          validator: validateUserId,
+          trigger: "change" // blur change
         }
       ],
       petName: [
@@ -141,58 +140,57 @@ export default defineComponent({
           message: "请输入昵称"
         }
       ],
-      mobile: [
-        {
-          required: true,
-          message: "请输入手机号"
-        }
-      ],
       roles: [
         {
+          type: "array",
           required: true,
-          message: "请输入角色"
+          message: "请选择角色"
         }
       ]
     });
+
     const { resetFields, validate, validateInfos } = useForm(
       frmModel,
       rulesRef
     );
-    //提交处理
-    // const processSubmit = ;
-    // const processReset = ;
+
     // 调用上级接口
     interEvtSubmit(async () => {
       try {
         let data = await validate();
-        console.log(toRaw(frmModel));
+        // console.log(toRaw(frmModel));
         console.log(data);
-        // alert("完成" + JSON.stringify(toRaw(frmModel)));
-        roleApi.saveData(toRaw(frmModel)).then;
-        return true;
+        let result = await userApi.saveData(toRaw(frmModel));
+        return handleHttpResut(result);
       } catch (err) {
-        console.log("error", err);
-        new Error("参数必须是number类型，并且小于等于10");
+        console.error("error", err);
+        return false;
       }
     });
+
+    // 重置表单事件
     interEvtReset(async () => {
       resetFields();
     });
+
     // 初始化表单
     const initFormData = () => {
-      roleApi.getDetail(frmModel.id).then(res => {
+      userApi.getFormData(frmModel.id).then(res => {
         if (res.code == 0) {
           Object.assign(frmModel, res.data);
+          interEvtCloseLoad();
         }
       });
     };
+
     // 加载初始化数据
     onMounted(() => {
-      // console.info("onMounted...." + interData.value);
-      //console.info(JSON.stringify(interData.value));
       if (interData.value == undefined) {
+        state.form_mod = "ADD";
         frmModel.id = null;
+        interEvtCloseLoad();
       } else {
+        state.form_mod = "EDIT";
         frmModel.id = interData.value;
         initFormData();
       }

@@ -114,17 +114,18 @@ instance.interceptors.request.use(
     // 判断为post请求，序列化传来的参数
     if (method === "post") {
       request.data = qs.stringify(request.data, {
-        arrayFormat: "repeat", // ids=1&ids=2
-        allowDots: true
-      });
-    } else if (method === "put") {
-      console.info("use put method do it");
-    } else if (method === "patch") {
-      request.data = qs.stringify(request.data, {
         // arrayFormat: "brackets", // //brackets ids[]=12&ids[]=333
         arrayFormat: "indices", // ids[0]=1&ids[1]=2
         allowDots: true // ids[0].id=12&ids[1].name=ricky
         // allowDots: false // ids[][id]=12&ids[][name]=ricky
+      });
+    } else if (method === "put") {
+      console.info("use put method do it");
+      console.info("不格式化成URL参数");
+    } else if (method === "patch") {
+      request.data = qs.stringify(request.data, {
+        arrayFormat: "repeat", // ids=1&ids=2
+        allowDots: true
       });
     }
     return request;

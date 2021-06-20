@@ -199,6 +199,7 @@ export default {
         listName: "面食",
         age: ["21", "22", "23", "24"],
         person: {
+          className: "百花丛中过g",
           operate: "人在",
           value: ["21", "22", "23", "24"],
           column: "age"

@@ -1,6 +1,56 @@
 import { Modal, notification } from "ant-design-vue";
 import { h, createVNode } from "vue";
 import { DownOutlined } from "@ant-design/icons-vue";
+
+/**
+ * 树转列表
+ *
+ * @param tree Tree JSON 数组
+ * @param field 子节点字段
+ */
+export function FindTreeNode(treeJson, val, field = "id") {
+  //arr.reduce(function(prev, cur, index, arr) {console.log(prev, cur, index);
+  //  return prev + cur;
+  // }，0) //注意这里设置了初始值}
+
+  return treeJson.reduce((list, item) => {
+    if (item[field] == val) {
+      list.push(item);
+    } else {
+      let childrenData = item["children"];
+      if (childrenData?.length > 0) {
+        childrenData = FindTreeNode(childrenData, val);
+        list = list.concat(childrenData);
+      }
+    }
+    return list;
+  }, []);
+
+  // let retValue = null;
+  // try {
+  //   treeJson.forEach(curItem => {
+  //     let tempValue = curItem[field];
+  //     if (tempValue == value) {
+  //       retValue = curItem;
+  //       throw new Error("Find done");
+  //     } else {
+  //       let childrenData = curItem["children"];
+  //       console.info(curItem.id + "-childrenData1=" + childrenData);
+  //       if (childrenData != undefined && childrenData?.length > 0) {
+  //         console.info(curItem.id + "-childrenData2=调用");
+  //         let tmp = FindTreeNode(childrenData, value);
+  //         if (tmp != null) {
+  //           retValue = tmp;
+  //           throw new Error("Find done Last.");
+  //         }
+  //       }
+  //     }
+  //   });
+  // } catch (e) {
+  //   console.info(e);
+  // }
+  // return retValue;
+}
 /**
  * 树转列表
  *
@@ -19,7 +69,12 @@ export function TreeToList(tree, children = "children") {
     return list;
   }, []);
 }
-
+/**
+ * 清除空的节点
+ *
+ * @param tree Tree JSON 数组
+ * @param children 子节点字段
+ */
 export function TreeCleanEmptyNode(treeList, children = "children") {
   treeList.forEach(it => {
     let childrenData = it[children];

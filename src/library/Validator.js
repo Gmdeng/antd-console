@@ -1,8 +1,9 @@
+// 表单验证
 // 手机号验证
 export async function MobileNumberValidator(rule, value) {
   const idcardReg = /^1(3|4|5|6|7|8|9)\d{9}$/;
   if (!idcardReg.test(value)) {
-    return Promise.reject("非法格式");
+    return Promise.reject("无效手机号码格式");
   }
   // Note: 必须总是返回一个 callback，否则 validateFieldsAndScroll 无法响应
   return Promise.resolve();
@@ -12,7 +13,7 @@ export async function MobileNumberValidator(rule, value) {
 export async function EmailValidator(rule, value) {
   const idcardReg = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
   if (!idcardReg.test(value)) {
-    return Promise.reject("非法格式");
+    return Promise.reject("无效邮箱格式");
   }
   // Note: 必须总是返回一个 callback，否则 validateFieldsAndScroll 无法响应
   return Promise.resolve();
@@ -22,7 +23,7 @@ export async function EmailValidator(rule, value) {
 export async function IDValidator(rule, value) {
   const idcardReg = /^[1-9][0-9]{5}(19|20)[0-9]{2}((01|03|05|07|08|10|12)(0[1-9]|[1-2][0-9]|31)|(04|06|09|11)(0[1-9]|[1-2][0-9]|30)|02(0[1-9]|[1-2][0-9]))[0-9]{3}([0-9]|x|X)$/;
   if (!idcardReg.test(value)) {
-    return Promise.reject("非法格式");
+    return Promise.reject("无效身份证格式");
   }
   return Promise.resolve();
 }
