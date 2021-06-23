@@ -9,7 +9,7 @@ export default {
    */
   getDataListByPage(params) {
     console.info(JSON.stringify(params));
-    return Axios.get(`${BASE_URL}/getDataListByPage`, params);
+    return Axios.post(`${BASE_URL}/getDataListByPage`, params);
   },
   /**
    * 保存
@@ -19,7 +19,6 @@ export default {
   },
   /**
    * 获取明细
-   * @param {ID} id
    */
   getDetail(id) {
     return Axios.get(`${BASE_URL}/getDetail?id=${id}`);

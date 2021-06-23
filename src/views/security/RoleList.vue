@@ -126,14 +126,6 @@ export default {
         showSizeChanger: true, // 显示可改变每页数量
         pageSizeOptions: ["15", "30", "50", "100"], // 每页数量选项
         showTotal: (total, range) => `共 ${total} 条数据, - ${range} ` // 显示总数
-      },
-      operateList: {
-        ADD: { key: 1, text: "增加", color: "red" },
-        MODIFY: { key: 2, text: "修改", color: "blue" },
-        DELETE: { key: 4, text: "删除", color: "gold" },
-        CANCEL: { key: 8, text: "取消", color: "red" },
-        AUDIT: { key: 16, text: "审核", color: "green" },
-        VIEW: { key: 32, text: "查看", color: "blue" }
       }
     });
     // 提交数组
@@ -229,6 +221,7 @@ export default {
         alert(JSON.stringify(res));
       });
     };
+    /*************************************************************************************** */
     // 编辑事件
     const handleEditEvent = (type, data) => {
       if (type == "ADD") {

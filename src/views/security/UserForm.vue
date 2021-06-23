@@ -109,6 +109,7 @@ export default defineComponent({
         state.roleList = res.data;
       }
     });
+
     // 验证编码唯一性
     const validateUserId = async (rule, value) => {
       let ret = await validatorApi.getCheckUserUniqueUID(value);
@@ -122,6 +123,7 @@ export default defineComponent({
       }
       return Promise.resolve();
     };
+
     // 表单验证
     const rulesRef = reactive({
       userId: [

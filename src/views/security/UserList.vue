@@ -83,7 +83,6 @@
             </span>
           </template>
         </a-table-column>
-        <a-table-column key="id" title="ID" data-index="id" />
         <a-table-column key="userId" title="用户名" data-index="userId" />
         <a-table-column key="petName" title="昵称" data-index="petName" />
         <a-table-column key="mobile" title="手机号" data-index="mobile" />
@@ -106,7 +105,7 @@
       </a-table>
     </a-spin>
   </div>
-  <d-drawer :title="formTitle" ref="refEditWrap">
+  <d-drawer :title="formTitle" ref="refEditWrap" :refreshParent="refreshPage">
     <user-form></user-form>
   </d-drawer>
   <d-drawer title="查看表单" ref="refViewWrap" :footerVisible="false">
@@ -203,8 +202,9 @@ export default {
         .getDataListByPage(param)
         .then(res => {
           if (res.code == 0) {
-            state.pagination.total = res.data.totalRecord;
-            state.dataList = res.data.dataList;
+            state.pagination.total = res.pager.totalRecord;
+            state.pagination.pageSize = res.pager.pageSize;
+            state.dataList = res.dataList;
           }
           state.loading = false;
         })
@@ -212,6 +212,15 @@ export default {
           //alert(err);
           state.loading = false;
         });
+    };
+    // 刷新页面
+    const refreshPage = () => {
+      //alert(val + "=======" + txt);
+      let param = {
+        pageSize: state.pagination.pageSize,
+        current: state.pagination.current
+      };
+      loadData(param);
     };
     // 加载事件
     onMounted(() => {
@@ -226,7 +235,8 @@ export default {
       handleTableChange,
       handleEditEvent,
       refEditWrap,
-      refViewWrap
+      refViewWrap,
+      refreshPage
     };
   }
 };
