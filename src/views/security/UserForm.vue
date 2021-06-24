@@ -12,11 +12,11 @@
         <a-form-item label="昵称" v-bind="validateInfos.petName">
           <a-input v-model:value="frmModel.petName" placeholder="请输入昵称" />
         </a-form-item>
-        <a-form-item label="手机号" v-bind="validateInfos.mobileNo">
-          <a-input
-            v-model:value="frmModel.mobileNo"
-            placeholder="请输入手机号"
-          />
+        <a-form-item label="手机号" v-bind="validateInfos.mobile">
+          <a-input v-model:value="frmModel.mobile" placeholder="请输入手机号" />
+        </a-form-item>
+        <a-form-item label="邮箱" v-bind="validateInfos.email">
+          <a-input v-model:value="frmModel.email" placeholder="请输入邮箱" />
         </a-form-item>
         <a-form-item label="角色" v-bind="validateInfos.roles">
           <a-select
@@ -86,7 +86,6 @@ export default defineComponent({
     /*** 接口============================================== end */
     // 定义变量名称
     const state = reactive({
-      form_mod: "EDIT", // 操作
       roleList: []
     });
 
@@ -95,7 +94,8 @@ export default defineComponent({
       id: "", // ID
       userId: "", // 用户名
       petName: "", // 昵称
-      mobileNo: "", // 手机号
+      mobile: "", // 手机号
+      email: "", // 邮箱
       allowIpaddr: "", // 允许登录IP
       denyIpaddr: "", // 拒绝登录IP
       notes: "", // 描述,
@@ -188,11 +188,9 @@ export default defineComponent({
     // 加载初始化数据
     onMounted(() => {
       if (interData.value == undefined) {
-        state.form_mod = "ADD";
         frmModel.id = null;
         interEvtCloseLoad();
       } else {
-        state.form_mod = "EDIT";
         frmModel.id = interData.value;
         initFormData();
       }

@@ -86,6 +86,7 @@
         <a-table-column key="userId" title="用户名" data-index="userId" />
         <a-table-column key="petName" title="昵称" data-index="petName" />
         <a-table-column key="mobile" title="手机号" data-index="mobile" />
+        <a-table-column key="email" title="邮箱" data-index="email" />
         <a-table-column
           key="allowIpaddr"
           title="允许登录IP"
@@ -132,8 +133,8 @@ export default {
     UserView
   },
   setup() {
-    const refEditWrap = ref();
-    const refViewWrap = ref();
+    const refEditWrap = ref(),
+      refViewWrap = ref();
     // Vue2.0中 data
     const state = reactive({
       formTitle: "",
@@ -220,6 +221,7 @@ export default {
         pageSize: state.pagination.pageSize,
         current: state.pagination.current
       };
+      
       loadData(param);
     };
     // 加载事件

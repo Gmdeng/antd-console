@@ -2,7 +2,7 @@ import Axios from "@/library/Axios";
 /**
  * 用户相关接口
  */
- const BASE_URL = "/admin/system/user";
+const BASE_URL = "/admin/system/user";
 export default {
   /**
    * 分页获取数据列表
@@ -16,6 +16,12 @@ export default {
    */
   saveData(formData) {
     return Axios.post(`${BASE_URL}/saveData`, formData);
+  },
+  /**
+   * 获取表单明细
+   */
+  getFormData(id) {
+    return Axios.get(`${BASE_URL}/getFormData?id=${id}`);
   },
   /**
    * 获取明细
