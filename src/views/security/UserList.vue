@@ -87,16 +87,6 @@
         <a-table-column key="petName" title="昵称" data-index="petName" />
         <a-table-column key="mobile" title="手机号" data-index="mobile" />
         <a-table-column key="email" title="邮箱" data-index="email" />
-        <a-table-column
-          key="allowIpaddr"
-          title="允许登录IP"
-          data-index="allowIpaddr"
-        />
-        <a-table-column
-          key="denyIpaddr"
-          title="拒绝登录IP"
-          data-index="denyIpaddr"
-        />
         <a-table-column key="status" title="状态" data-index="status" />
         <a-table-column key="create" title="创建时间/人">
           <template #default="{ record }">
@@ -221,7 +211,6 @@ export default {
         pageSize: state.pagination.pageSize,
         current: state.pagination.current
       };
-      
       loadData(param);
     };
     // 加载事件

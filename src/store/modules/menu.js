@@ -1,4 +1,4 @@
-import MenuApi from "@/api/menuApi";
+import menuApi from "@/api/menuApi";
 import router from "@/router";
 import { TreeToList } from "@/library/utils/Functions";
 const MENU_STORAGE = "menu-tree";
@@ -101,7 +101,7 @@ const menuModule = {
   },
   actions: {
     async loadMenu({ commit }) {
-      const { data } = await MenuApi.getMenuList();
+      const { data } = await menuApi.getMenuList();
       commit("saveMenuTree", data);
     },
     addMenu({ state, commit }, menu) {

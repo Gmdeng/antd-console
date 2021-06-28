@@ -57,7 +57,6 @@
           />
         </a-form-item>
       </a-form>
-      roleList: {{ roleList }}
     </a-col>
   </a-row>
 </template>

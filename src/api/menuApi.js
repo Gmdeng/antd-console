@@ -2,7 +2,7 @@ import Axios from "@/library/Axios";
 /**
  * 菜单相关
  */
-const BASE_URL = "/menus";
+const BASE_URL = "/admin/menu";
 export default {
   /**
    * 获取菜单

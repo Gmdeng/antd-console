@@ -19,7 +19,9 @@
           {{ frmModel.email }}
         </a-form-item>
         <a-form-item label="角色">
-          {{ frmModel.roles }}
+          <a-tag color="cyan" v-for="(it, key) in frmModel.roles" :key="key">
+            {{ it.name }}
+          </a-tag>
         </a-form-item>
         <a-form-item label="允许登录IP">
           {{ frmModel.allowIpaddr }}
@@ -29,6 +31,15 @@
         </a-form-item>
         <a-form-item label="备注">
           {{ frmModel.remarks }}
+        </a-form-item>
+        <a-form-item label="状态">
+          <a-tag color="cyan">{{ frmModel.status }}</a-tag>
+        </a-form-item>
+        <a-form-item label="更新人/时间">
+          {{ frmModel.updateBy }} /{{ frmModel.updateOn }}
+        </a-form-item>
+        <a-form-item label="创建人/时间">
+         {{ frmModel.createBy }} /{{ frmModel.createOn }}
         </a-form-item>
       </a-form>
     </a-col>
