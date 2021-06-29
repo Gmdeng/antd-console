@@ -17,32 +17,38 @@
       </template>
       <a-descriptions
         v-if="searchVisible"
-        title="-- 搜索条件 --"
         size="small"
-        :column="6"
+        :column="{ xs: 4, sm: 8, md: 12 }"
         layout="vertical"
       >
         <template #extra>
-          <a-button type="primary">搜索</a-button>
+          <a-button type="primary" @click="onSearchData"> 搜索 </a-button>
         </template>
-        <a-descriptions-item label="Created">
-          <a-input placeholder="Created" />
+        <a-descriptions-item label="创建时间">
+          <a-date-picker
+            v-model:value="searchData.created"
+            valueFormat="YYYY-MM-DD"
+          />
         </a-descriptions-item>
-        <a-descriptions-item label="Created">
-          <a-input placeholder="Association" />
+        <a-descriptions-item label="创建时间" :span="2">
+          <a-range-picker
+            v-model:value="searchData.rangeDate"
+            valueFormat="YYYY-MM-DD"
+          />
         </a-descriptions-item>
-        <a-descriptions-item label="Created">
-          <a-input placeholder="Creation Time"
-        /></a-descriptions-item>
-        <a-descriptions-item label="Created">
-          <a-input placeholder="Effective Time"
-        /></a-descriptions-item>
-        <a-descriptions-item label="Created">
-          <a-input placeholder="Remark" />
+        <a-descriptions-item label="用户">
+          <a-input v-model:value="searchData.userId" placeholder="用户" />
+        </a-descriptions-item>
+        <a-descriptions-item label="手机号">
+          <a-input v-model:value="searchData.mobile" placeholder="手机号" />
+        </a-descriptions-item>
+        <a-descriptions-item label="邮箱">
+          <a-input v-model:value="searchData.email" placeholder="邮箱" />
         </a-descriptions-item>
       </a-descriptions>
     </a-page-header>
   </div>
+  {{ searchData }}
   <!-- 头部内容end -->
   <div class="gm-container">
     <a-spin :spinning="loading" style="width: 100%">
@@ -132,12 +138,20 @@ export default {
       loading: true,
       dataList: [],
       pagination: {
+        current: 1,
         total: 0, //总条数
         pageSize: 15, // 每页条数
         defaultPageSize: 15, //默认每页显示数量
         showSizeChanger: true, // 显示可改变每页数量
         pageSizeOptions: ["15", "30", "50", "100"], // 每页数量选项
         showTotal: (total, range) => `共 ${total} 条数据, - ${range} ` // 显示总数
+      },
+      searchData: {
+        created: "",
+        userId: "",
+        mobile: "",
+        email: "",
+        rangeDate: ""
       }
     });
 
@@ -169,16 +183,15 @@ export default {
     };
     // 列表分页事件
     const handleTableChange = (pagination, filters, sorter, ds) => {
-      //console.info(JSON.stringify(pagination));
+      console.info(JSON.stringify(pagination));
       console.info(JSON.stringify(filters));
       console.info(JSON.stringify(sorter));
       // console.info(JSON.stringify(ds.currentDataSource));
-      let param = {
-        pageSize: pagination.pageSize,
-        current: pagination.current
-      };
+
+      state.pagination.pageSize = pagination.pageSize;
+      state.pagination.current = pagination.current;
       //
-      loadData(param);
+      loadData();
       return {
         pagination,
         filters,
@@ -187,8 +200,14 @@ export default {
       };
     };
     // 加载数据列表
-    const loadData = param => {
+    const loadData = () => {
       state.loading = true;
+      let param = {
+        pageSize: state.pagination.pageSize,
+        current: state.pagination.current
+      };
+      Object.assign(param, state.searchData);
+      //
       userApi
         .getDataListByPage(param)
         .then(res => {
@@ -206,20 +225,15 @@ export default {
     };
     // 刷新页面
     const refreshPage = () => {
-      //alert(val + "=======" + txt);
-      let param = {
-        pageSize: state.pagination.pageSize,
-        current: state.pagination.current
-      };
-      loadData(param);
+      loadData();
+    };
+    const onSearchData = () => {
+      state.pagination.current = 1;
+      loadData();
     };
     // 加载事件
     onMounted(() => {
-      let param = {
-        pageSize: state.pagination.pageSize,
-        current: 1
-      };
-      loadData(param);
+      loadData();
     });
     return {
       ...toRefs(state),
@@ -227,7 +241,8 @@ export default {
       handleEditEvent,
       refEditWrap,
       refViewWrap,
-      refreshPage
+      refreshPage,
+      onSearchData
     };
   }
 };

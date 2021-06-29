@@ -1,49 +1,57 @@
 <template>
-  <a-row :gutter="24">
-    <a-col :sm="24" :md="12" :xl="12">
-      <a-form
-        :label-col="labelCol"
-        :wrapper-col="wrapperCol"
-        :scrollToFirstError="true"
-      >
-        <a-form-item label="用户名">
-          {{ frmModel.userId }}
-        </a-form-item>
-        <a-form-item label="昵称">
-          {{ frmModel.petName }}
-        </a-form-item>
-        <a-form-item label="手机号">
-          {{ frmModel.mobile }}
-        </a-form-item>
-        <a-form-item label="邮箱">
-          {{ frmModel.email }}
-        </a-form-item>
-        <a-form-item label="角色">
-          <a-tag color="cyan" v-for="(it, key) in frmModel.roles" :key="key">
-            {{ it.name }}
-          </a-tag>
-        </a-form-item>
-        <a-form-item label="允许登录IP">
-          {{ frmModel.allowIpaddr }}
-        </a-form-item>
-        <a-form-item label="拒绝登录IP">
-          {{ frmModel.denyIpaddr }}
-        </a-form-item>
-        <a-form-item label="备注">
-          {{ frmModel.remarks }}
-        </a-form-item>
-        <a-form-item label="状态">
-          <a-tag color="cyan">{{ frmModel.status }}</a-tag>
-        </a-form-item>
-        <a-form-item label="更新人/时间">
-          {{ frmModel.updateBy }} /{{ frmModel.updateOn }}
-        </a-form-item>
-        <a-form-item label="创建人/时间">
-         {{ frmModel.createBy }} /{{ frmModel.createOn }}
-        </a-form-item>
-      </a-form>
-    </a-col>
-  </a-row>
+  <a-descriptions title="用户信息 User Info" bordered>
+    <a-descriptions-item label="用户名">
+      {{ frmModel.userId }}
+    </a-descriptions-item>
+    <a-descriptions-item label="昵称">
+      {{ frmModel.petName }}
+    </a-descriptions-item>
+    <a-descriptions-item label="状态">
+      <a-tag color="cyan">{{ frmModel.status }}</a-tag>
+    </a-descriptions-item>
+    <a-descriptions-item label="手机号">
+      {{ frmModel.mobile }}
+    </a-descriptions-item>
+    <a-descriptions-item label="邮箱" :span="2">
+      {{ frmModel.email }}
+    </a-descriptions-item>
+    <a-descriptions-item label="角色" :span="3">
+      <a-tag color="cyan" v-for="(it, key) in frmModel.roles" :key="key">
+        {{ it.name }}
+      </a-tag>
+    </a-descriptions-item>
+    <a-descriptions-item label="允许登录IP" :span="3">
+      {{ frmModel.allowIpaddr }}
+    </a-descriptions-item>
+    <a-descriptions-item label="拒绝登录IP" :span="3">
+      {{ frmModel.denyIpaddr }}
+    </a-descriptions-item>
+    <a-descriptions-item label="备注" :span="3">
+      {{ frmModel.remarks }}
+    </a-descriptions-item>
+    <a-descriptions-item label="更新人/时间">
+      {{ frmModel.updateBy }} /{{ frmModel.updateOn }}
+    </a-descriptions-item>
+    <a-descriptions-item label="创建人/时间">
+      {{ frmModel.createBy }} /{{ frmModel.createOn }}
+    </a-descriptions-item>
+  </a-descriptions>
+
+  <a-space>
+    <a-date-picker
+      show-time
+      placeholder="Select Time"
+      @change="onChange"
+      @ok="onOk"
+    />
+    <a-range-picker
+      :show-time="{ format: 'HH:mm' }"
+      format="YYYY-MM-DD HH:mm"
+      :placeholder="['Start Time', 'End Time']"
+      @change="onChange"
+      @ok="onOk"
+    />
+  </a-space>
 </template>
 <script>
 import { defineComponent, reactive, inject, onMounted, toRefs } from "vue";
