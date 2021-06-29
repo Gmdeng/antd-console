@@ -10,19 +10,24 @@
         <a-button key="3" @click="handleEditEvent('ADD')"
           ><FormOutlined />新增</a-button
         >
-        <a-button key="3" @click="searchVisible = !searchVisible"
-          ><SearchOutlined /><DownOutlined v-if="!searchVisible"/>
-          <UpOutlined v-if="searchVisible"
-        /></a-button>
+        <a-tooltip title="点击显示查询条件" color="#f50">
+          <a-button @click="searchVisible = !searchVisible">
+            <SearchOutlined />
+            <DownOutlined v-if="!searchVisible"/>
+            <UpOutlined v-if="searchVisible"/>
+          </a-button>
+        </a-tooltip>
       </template>
       <a-descriptions
         v-if="searchVisible"
-        size="small"
         :column="{ xs: 4, sm: 8, md: 12 }"
         layout="vertical"
       >
         <template #extra>
-          <a-button type="primary" @click="onSearchData"> 搜索 </a-button>
+          <a-radio-group>
+            <a-button type="danger" @click="onResetData"> 复原 </a-button>
+            <a-button type="primary" @click="onSearchData"> 搜索 </a-button>
+          </a-radio-group>
         </template>
         <a-descriptions-item label="创建时间">
           <a-date-picker
@@ -118,6 +123,7 @@ import { DDrawer } from "@/components";
 import userApi from "@/api/userApi";
 import UserForm from "./UserForm";
 import UserView from "./UserView";
+import pager from "@/library/Common";
 export default {
   components: {
     //图标
@@ -137,15 +143,7 @@ export default {
       searchVisible: false,
       loading: true,
       dataList: [],
-      pagination: {
-        current: 1,
-        total: 0, //总条数
-        pageSize: 15, // 每页条数
-        defaultPageSize: 15, //默认每页显示数量
-        showSizeChanger: true, // 显示可改变每页数量
-        pageSizeOptions: ["15", "30", "50", "100"], // 每页数量选项
-        showTotal: (total, range) => `共 ${total} 条数据, - ${range} ` // 显示总数
-      },
+      pagination: pager, // 分页参数
       searchData: {
         created: "",
         userId: "",
@@ -183,11 +181,6 @@ export default {
     };
     // 列表分页事件
     const handleTableChange = (pagination, filters, sorter, ds) => {
-      console.info(JSON.stringify(pagination));
-      console.info(JSON.stringify(filters));
-      console.info(JSON.stringify(sorter));
-      // console.info(JSON.stringify(ds.currentDataSource));
-
       state.pagination.pageSize = pagination.pageSize;
       state.pagination.current = pagination.current;
       //
@@ -231,6 +224,15 @@ export default {
       state.pagination.current = 1;
       loadData();
     };
+    const onResetData = () => {
+      state.searchData = {
+        created: "",
+        userId: "",
+        mobile: "",
+        email: "",
+        rangeDate: ""
+      }
+    };
     // 加载事件
     onMounted(() => {
       loadData();
@@ -242,7 +244,8 @@ export default {
       refEditWrap,
       refViewWrap,
       refreshPage,
-      onSearchData
+      onSearchData,
+      onResetData
     };
   }
 };

@@ -227,11 +227,11 @@ export default defineComponent({
       menus: ["主页", "列表"]
     });
     const formState = reactive({
-      newPasswd: "hell", // 新密码
+      newPasswd: "hello", // 新密码
       oldPasswd: "", // 旧密码
       rePasswd: "" // 重新密码
     });
-
+    // 当前活动KEY
     const activeKey = computed(() => store.state.menu.activeMenu.key),
       getters = computed(() => store.getters), // 获取整个getters
       filterMenu = computed(() => store.getters["menu/filterMenu"]); //获取单个getters
@@ -275,19 +275,6 @@ export default defineComponent({
     };
     // 菜单切换操作事件
     const onTabsChange = key => {
-      let tmps = [
-        "权限管理",
-        "角色管理",
-        "用户管理",
-        "订单管理",
-        "商品管理",
-        "分类管理",
-        "属性管理"
-      ];
-      let idx = Math.floor(Math.random() * 7);
-      state.menus = [];
-      state.menus.push("主页");
-      state.menus.push(tmps[idx] + " " + idx);
       store.dispatch("menu/switchMenu", key);
     };
     // 退出

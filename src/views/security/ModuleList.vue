@@ -16,7 +16,7 @@
   <div class="gm-container">
     <a-spin :spinning="loading" style="width: 100%">
       <a-table
-        :defaultExpandAllRows="true"
+        :defaultExpandAllRows="false"
         :pagination="false"
         :row-key="record => record.id"
         :data-source="dataList"

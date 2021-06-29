@@ -2,7 +2,7 @@ import menuApi from "@/api/menuApi";
 import router from "@/router";
 import { TreeToList } from "@/library/utils/Functions";
 const MENU_STORAGE = "menu-tree";
-const FIXED_MENU = { key: 1, url: "/home", name: "主页", closable: false }; // 固定菜单
+const FIXED_MENU = { key: 0, url: "/home", name: "主页", closable: false }; // 固定菜单
 //
 const menuModule = {
   namespaced: true,
@@ -36,7 +36,6 @@ const menuModule = {
           map[keyGen(item)] = item;
           return map;
         }, {});
-
         return data;
       };
     },
@@ -48,7 +47,6 @@ const menuModule = {
             if (filter(item)) {
               return item;
             }
-
             // 如果存在子菜单则递归一次
             const { children } = item;
             if (children?.length > 0) {
@@ -164,5 +162,4 @@ const menuModule = {
     }
   }
 };
-
 export default menuModule;
