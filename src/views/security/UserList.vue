@@ -13,8 +13,8 @@
         <a-tooltip title="点击显示查询条件" color="#f50">
           <a-button @click="searchVisible = !searchVisible">
             <SearchOutlined />
-            <DownOutlined v-if="!searchVisible"/>
-            <UpOutlined v-if="searchVisible"/>
+            <DownOutlined v-if="!searchVisible" />
+            <UpOutlined v-if="searchVisible" />
           </a-button>
         </a-tooltip>
       </template>
@@ -115,15 +115,15 @@
   </d-drawer>
 </template>
 <script>
-import { createVNode, reactive, ref, toRefs, onMounted } from "vue";
+import { reactive, ref, toRefs, onMounted } from "vue";
 import { DownOutlined, EditOutlined } from "@ant-design/icons-vue";
-import { Modal } from "ant-design-vue";
 import { DDrawer } from "@/components";
 
 import userApi from "@/api/userApi";
 import UserForm from "./UserForm";
 import UserView from "./UserView";
-import pager from "@/library/Common";
+import { pager } from "@/library/Common";
+import { handleSimpleEvent } from "@/library/utils/Functions";
 export default {
   components: {
     //图标
@@ -144,7 +144,7 @@ export default {
       loading: true,
       dataList: [],
       pagination: pager, // 分页参数
-      searchData: {
+      searchData: {// 搜索条件结构
         created: "",
         userId: "",
         mobile: "",
@@ -163,20 +163,21 @@ export default {
         refEditWrap.value.Open(data);
       } else if (type == "VIEW") {
         refViewWrap.value.Open(data);
-      } else if (type == "DELETE" || type == "AUTH") {
-        let typeText = type == "DELETE" ? "删除" : "审核";
-        Modal.confirm({
-          title: `确认想${typeText}这条记录吗?`,
-          icon: createVNode(DownOutlined),
-          content:
-            "When clicked the OK button, this dialog will be closed after 1 second",
-          onOk() {
-            return new Promise((resolve, reject) => {
-              setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-            }).catch(() => console.log("Oops errors!"));
-          },
-          onCancel() {}
-        });
+      } else if (type == "DELETE") {
+        //
+        handleSimpleEvent(
+          "删除",
+          userApi.deleteData,
+          { id: data },
+          refreshPage
+        );
+      } else if (type == "AUDTH") {
+        handleSimpleEvent(
+          "审核",
+          userApi.authData,
+          { id: data, status: 1 },
+          refreshPage
+        );
       }
     };
     // 列表分页事件
@@ -231,7 +232,7 @@ export default {
         mobile: "",
         email: "",
         rangeDate: ""
-      }
+      };
     };
     // 加载事件
     onMounted(() => {

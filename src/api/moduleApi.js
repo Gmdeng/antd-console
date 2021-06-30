@@ -75,8 +75,8 @@ export default {
   },
 
   /**
-   * 
-   * @returns 
+   *
+   * @returns
    */
   getAllActions() {
     return Axios.get(`${BASE_URL}/getAllActions`);

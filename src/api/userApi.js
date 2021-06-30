@@ -28,5 +28,22 @@ export default {
    */
   getDetail(id) {
     return Axios.get(`${BASE_URL}/getDetail?id=${id}`);
+  },
+  /**
+   * 审核
+   * @param {moduleId:157, status:0} formData
+   * @returns
+   */
+  authData(formData) {
+    return Axios.post(`${BASE_URL}/authData`, formData);
+  },
+
+  /**
+   * 删除
+   * @param {moduleId:157} formData
+   * @returns
+   */
+  deleteData(formData) {
+    return Axios.post(`${BASE_URL}/deleteData`, formData);
   }
 };
