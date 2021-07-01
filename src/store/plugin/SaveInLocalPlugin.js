@@ -1,10 +1,10 @@
 /**
  * 插件实际是一个函数
-
-Vuex 的 store 接受 plugins 选项，这个选项暴露出每次 mutation 的钩子。Vuex 插件就是一个函数，它接收 store 作为唯一参数：
-
-定义 插件
- * @param {*} store 
+ *
+ * Vuex 的 store 接受 plugins 选项，这个选项暴露出每次 mutation 的钩子。Vuex 插件就是一个函数，它接收 store 作为唯一参数：
+ *
+ * 定义 插件
+ * @param {*} store
  */
 export const saveInLocal = store => {
   // 当 store 初始化后调用

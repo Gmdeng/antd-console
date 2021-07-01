@@ -1,6 +1,8 @@
 /**
  * 它是一个长期存储得解决方法，因为放在state中的数据在刷新时会丢失，这时候使用这个plugin.js插件它会帮你存储起来。
+ *
  * @param {*} store
+ *
  */
 const plugin = store => {
   let arr = Object.keys(store.state);
@@ -18,6 +20,7 @@ const plugin = store => {
     // 每次 mutation 之后调用
     // mutation 的格式为 { type, payload }
     // console.log(arr);
+    console.log(mutation); //
     if (state.agreed == false) {
       localStorage.removeItem("login");
       window.sessionStorage.setItem("login", JSON.stringify(state.login));

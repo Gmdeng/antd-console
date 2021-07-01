@@ -3,7 +3,9 @@ import router from "@/router";
 import { TreeToList } from "@/library/utils/Functions";
 const MENU_STORAGE = "menu-tree";
 const FIXED_MENU = { key: 0, url: "/home", name: "主页", closable: false }; // 固定菜单
-//
+/**
+ *  菜单
+ * */
 const menuModule = {
   namespaced: true,
   state() {

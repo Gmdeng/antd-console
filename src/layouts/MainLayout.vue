@@ -148,7 +148,7 @@
       :label-col="{ span: 6 }"
       :wrapper-col="{ span: 14 }"
     >
-      <a-form-item label="旧密码">
+      <a-form-item label="原密码">
         <a-input-password
           v-model:value="formState.oldPasswd"
           placeholder="input password"
@@ -226,6 +226,8 @@ export default defineComponent({
       username: "What's Ip",
       menus: ["主页", "列表"]
     });
+
+    // 密码更改
     const formState = reactive({
       newPasswd: "hello", // 新密码
       oldPasswd: "", // 旧密码
@@ -279,7 +281,7 @@ export default defineComponent({
     };
     // 退出
     const onExitLogin = () => {
-      // $store.dispatch('auth/logout');
+      store.dispatch("auth/logout");
       // alert();
       Modal.confirm({
         title: "Do you Want to Exit Sytem?",
