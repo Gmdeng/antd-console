@@ -135,53 +135,20 @@
     </a-layout>
   </a-layout>
   <!-- 修改密码 -->
-  <a-modal
-    v-model:visible="modal2Visible"
-    title="修改密码"
-    ok-text="确认修改"
-    cancel-text="取消"
-    centered
-    @ok="modal2Visible = false"
-  >
-    <a-form
-      :model="formState"
-      :label-col="{ span: 6 }"
-      :wrapper-col="{ span: 14 }"
-    >
-      <a-form-item label="原密码">
-        <a-input-password
-          v-model:value="formState.oldPasswd"
-          placeholder="input password"
-        />
-      </a-form-item>
-      <a-form-item label="输入新密码">
-        <a-input-password
-          v-model:value="formState.newPasswd"
-          placeholder="input password"
-        />
-      </a-form-item>
-      <a-form-item label="再次输入密码">
-        <a-input-password
-          v-model:value="formState.rePasswd"
-          placeholder="input password"
-        />
-      </a-form-item>
-    </a-form>
-  </a-modal>
+  <d-modify-password ref="refModifyPassowdWrap"></d-modify-password>
 </template>
 <script>
 import {
-  createVNode,
   defineComponent,
   reactive,
   toRefs,
   watch,
   computed,
-  getCurrentInstance
+  getCurrentInstance,
+  ref
 } from "vue";
 
 import { DMenu, DBreadcrumb } from "@/components";
-import { Modal } from "ant-design-vue";
 import {
   DownOutlined,
   BarsOutlined,
@@ -189,12 +156,11 @@ import {
   LockOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  ExclamationCircleOutlined,
   LogoutOutlined
 } from "@ant-design/icons-vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
-
+import { DModifyPassword } from "@/components";
 export default defineComponent({
   name: "MainLayout",
   components: {
@@ -206,12 +172,14 @@ export default defineComponent({
     LockOutlined,
     MenuUnfoldOutlined,
     MenuFoldOutlined,
-    LogoutOutlined
+    LogoutOutlined,
+    DModifyPassword
   },
   setup(props, context) {
     context.attrs;
     context.slots;
     context.emit;
+    const refModifyPassowdWrap = ref(); // 编辑
     // console.dir(props);
     const { ctx } = getCurrentInstance();
     // 状态管理器
@@ -220,19 +188,12 @@ export default defineComponent({
 
     /*=属性定义========================================*/
     const state = reactive({
-      modal2Visible: false,
       collapsed: true,
       loading: false,
       username: "What's Ip",
       menus: ["主页", "列表"]
     });
 
-    // 密码更改
-    const formState = reactive({
-      newPasswd: "hello", // 新密码
-      oldPasswd: "", // 旧密码
-      rePasswd: "" // 重新密码
-    });
     // 当前活动KEY
     const activeKey = computed(() => store.state.menu.activeMenu.key),
       getters = computed(() => store.getters), // 获取整个getters
@@ -257,7 +218,7 @@ export default defineComponent({
     // 修改密码
     const onModifyPasswd = () => {
       ctx.$message.error("修改密码");
-      state.modal2Visible = true;
+      refModifyPassowdWrap.value.Open();
     };
     // 菜单操作事件
     const onTabsAdd = item => {
@@ -282,26 +243,6 @@ export default defineComponent({
     // 退出
     const onExitLogin = () => {
       store.dispatch("auth/logout");
-      // alert();
-      Modal.confirm({
-        title: "Do you Want to Exit Sytem?",
-        icon: createVNode(ExclamationCircleOutlined),
-        content: createVNode(
-          "div",
-          { style: "color:red;" },
-          "退出当前登录系统! 将需要再次登录才能操作"
-        ),
-        centered: true,
-        okText: "确认退出",
-        onOk() {
-          console.log("OK");
-        },
-        cancelText: "暂时不要",
-        onCancel() {
-          console.log("Cancel");
-        },
-        class: "test"
-      });
     };
     return {
       ...toRefs(state),
@@ -312,10 +253,10 @@ export default defineComponent({
       onTabsAction,
       onTabsChange,
       onExitLogin,
-      formState,
       activeKey,
       getters,
-      filterMenu
+      filterMenu,
+      refModifyPassowdWrap
     };
   }
 });

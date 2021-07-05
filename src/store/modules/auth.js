@@ -1,4 +1,7 @@
-import confirm from "ant-design-vue/es/modal/confirm";
+import { createVNode } from "vue";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+//import confirm from "ant-design-vue/es/modal/confirm";
+import { Modal } from "ant-design-vue";
 const state = {
   accessToken: "Init-Data"
 };
@@ -14,10 +17,14 @@ const actions = {
   async logout({ state, commit }) {
     // alert(998);
     commit("saveToken", 9898);
-    confirm({
+    Modal.confirm({
       title: "您确认要退出系统吗?" + state.accessToken,
-      content:
-        "When clicked the OK button, this dialog will be closed after 1 second",
+      icon: createVNode(ExclamationCircleOutlined),
+      content: createVNode(
+        "div",
+        { style: "color:red;" },
+        "退出当前登录系统! 将需要再次登录才能操作 When clicked the OK button, this dialog will be closed after 1 second"
+      ),
       okText: " 确认退出 ",
       onOk() {
         return new Promise((resolve, reject) => {
