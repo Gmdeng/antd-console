@@ -4,4 +4,14 @@ import DBreadcrumb from "./DBreadcrumb";
 import DInput from "./DInput";
 import DTimeline from "./DTimeline";
 import DModifyPassword from "./DModifyPassword";
-export { DMenu, DDrawer, DBreadcrumb, DInput, DTimeline, DModifyPassword };
+import DProfile from "./DProfile";
+// 暴露出来
+export {
+  DMenu,
+  DDrawer,
+  DBreadcrumb,
+  DInput,
+  DTimeline,
+  DModifyPassword,
+  DProfile
+};

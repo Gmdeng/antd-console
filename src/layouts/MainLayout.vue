@@ -136,6 +136,8 @@
   </a-layout>
   <!-- 修改密码 -->
   <d-modify-password ref="refModifyPassowdWrap"></d-modify-password>
+  <!-- 个人信息 -->
+  <d-profile ref="refProfileWrap"></d-profile>
 </template>
 <script>
 import {
@@ -160,7 +162,7 @@ import {
 } from "@ant-design/icons-vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
-import { DModifyPassword } from "@/components";
+import { DModifyPassword, DProfile } from "@/components";
 export default defineComponent({
   name: "MainLayout",
   components: {
@@ -173,13 +175,15 @@ export default defineComponent({
     MenuUnfoldOutlined,
     MenuFoldOutlined,
     LogoutOutlined,
-    DModifyPassword
+    DModifyPassword,
+    DProfile
   },
   setup(props, context) {
     context.attrs;
     context.slots;
     context.emit;
     const refModifyPassowdWrap = ref(); // 编辑
+    const refProfileWrap = ref();
     // console.dir(props);
     const { ctx } = getCurrentInstance();
     // 状态管理器
@@ -214,6 +218,7 @@ export default defineComponent({
     // 个人资料
     const onProfile = () => {
       ctx.$message.success("个人资料");
+      refProfileWrap.value.Open();
     };
     // 修改密码
     const onModifyPasswd = () => {
@@ -256,7 +261,8 @@ export default defineComponent({
       activeKey,
       getters,
       filterMenu,
-      refModifyPassowdWrap
+      refModifyPassowdWrap,
+      refProfileWrap
     };
   }
 });

@@ -39,7 +39,7 @@
 import { defineComponent, reactive, toRefs } from "vue";
 import { useForm } from "@ant-design-vue/use";
 export default defineComponent({
-  name: "DDrawer",
+  name: "DModifyPassword",
   setup(props) {
     console.info(props);
     //const { ctx } = getCurrentInstance();
