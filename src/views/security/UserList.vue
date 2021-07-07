@@ -173,6 +173,7 @@ export default {
             { label: "储值卡结算", value: "5" }
           ]
         },
+        
         {
           label: "开单时间",
           dataIndex: "startTime",
@@ -191,7 +192,13 @@ export default {
           dataIndex: "endTime",
           defaultValue: [],
           type: "date-range-picker"
-        }
+        },
+        {
+          label: "电子邮件",
+          dataIndex: "email",
+          defaultValue: "",
+          type: "input",
+        },
       ]
     });
 

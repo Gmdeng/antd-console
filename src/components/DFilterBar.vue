@@ -1,9 +1,5 @@
 <template>
   <div class="filterbox" v-click-away="onClickAway">
-    {{ options }}
-    <br />
-    -----------------------------
-    {{ frmData }}
     <a-input
       size="large"
       class="filter-input"
@@ -24,9 +20,15 @@
       >
         <!-- 自定义时间 -->
         <template v-if="filterItem.type == 'date-range-picker'">
-          <a-range-picker v-model:value="frmData[filterItem.dataIndex]">
+          <a-range-picker 
+            v-model:value="frmData[filterItem.dataIndex]"  
+            valueFormat="YYYY-MM-DD">
             <a-badge>{{ filterItem.label }}</a-badge>
           </a-range-picker>
+        </template>
+        <!-- 输入框 -->
+        <template v-else-if="filterItem.type == 'input'">
+          <a-input size="small" v-model:value="frmData[filterItem.dataIndex]" :placeholder="filterItem.label"></a-input>
         </template>
         <a-popover
           v-else
@@ -35,7 +37,7 @@
         >
           <template v-slot:content>
             <!-- 多选 -->
-            <a-checkbox-group v-if="filterItem.type == 'checkbox'">
+            <a-checkbox-group v-if="filterItem.type == 'checkbox'" v-model:value="frmData[filterItem.dataIndex]">
               <a-row v-for="(item, i) in filterItem.options" :key="i">
                 <a-col>
                   <a-checkbox :value="item.value">{{ item.label }}</a-checkbox>
@@ -43,7 +45,7 @@
               </a-row>
             </a-checkbox-group>
             <!-- 单选 -->
-            <a-radio-group v-else-if="filterItem.type == 'radio'">
+            <a-radio-group v-else-if="filterItem.type == 'radio'" v-model:value="frmData[filterItem.dataIndex]">
               <a-row v-for="(item, i) in filterItem.options" :key="i">
                 <a-col>
                   <a-radio :value="item.value">{{ item.label }}</a-radio>
@@ -54,7 +56,7 @@
           <div>
             <a-badge
               :dot="
-                filterItem.type == 'radio' && options[index].defaultValue
+                filterItem.type == 'radio' && frmData[filterItem.dataIndex].length > 0
                   ? true
                   : false
               "
@@ -63,10 +65,9 @@
               <a-badge
                 v-if="filterItem.type == 'checkbox'"
                 class="checkbox-badge"
-                :count="options[index].defaultValue.length"
+                :count="frmData[filterItem.dataIndex].length"
               />
             </a-badge>
-            <v-icon name="icon-xiala" class="fr"></v-icon>
           </div>
         </a-popover>
       </div>
@@ -76,30 +77,44 @@
       <span v-for="(it, j) in options" :key="j">
         <span v-if="it.type == 'date-range-picker'">
           <span>
-            <a-tag closable v-if="it.defaultValue.length">
-              {{ it.defaultValue.join(" ~ ") }}
+            <a-tag 
+              closable 
+              v-if="frmData[it.dataIndex].length" 
+              @close.prevent="clseTagEvent(it.dataIndex)">
+              {{ frmData[it.dataIndex].join(" ~ ") }}
             </a-tag>
           </span>
         </span>
+        <span v-else-if="it.type == 'input'">
+          <a-tag 
+            closable 
+            v-if="frmData[it.dataIndex].length > 0" 
+            @close.prevent="clseTagEvent(it.dataIndex)">
+            {{ frmData[it.dataIndex] }}
+          </a-tag>
+        </span>  
         <span v-else>
           <template v-for="(sub, i) in it.options">
             <template v-if="it.type == 'checkbox'">
               <a-tag
                 closable
                 :key="i"
-                v-if="it.defaultValue.indexOf(sub.value) != -1"
-                >{{ sub.label }}</a-tag
-              >
+                @close.prevent="clseTagEvent(it.dataIndex)"
+                v-if="frmData[it.dataIndex].indexOf(sub.value) != -1">
+                {{ sub.label }}</a-tag>
             </template>
             <template v-else-if="it.type == 'radio'">
-              <a-tag closable :key="i" v-if="item.defaultValue == sub.value">{{
-                sub.label
-              }}</a-tag>
+              <a-tag 
+                closable 
+                @close.prevent="clseTagEvent(it.dataIndex)"
+                :key="i" v-if="frmData[it.dataIndex] == sub.value">
+                {{ sub.label}}</a-tag>
             </template>
           </template>
         </span>
       </span>
     </div>
+    <!-- tags end -->
   </div>
 </template>
 
@@ -122,6 +137,7 @@ export default defineComponent({
     const state = reactive({
       show: false,
       timer: null,
+      hasTag: true,
       frmData: { keywords: "" }
     });
     //
@@ -150,6 +166,31 @@ export default defineComponent({
       });
     };
     // 事件
+    const clseTagEvent =(dataIndex) =>{
+      // alert(dataIndex);
+      let arr = props.options.filter(item =>{
+        return item.dataIndex === dataIndex;
+      });
+      //
+      if(arr.length == 1){
+        if(arr[0].type == "input"){
+          state.frmData[dataIndex] = "";
+        }else if(arr[0].type == "date-range-picker"){
+          state.frmData[dataIndex] = [];
+        }else if(arr[0].type == "checkbox"){
+          state.frmData[dataIndex] = [];
+         }else if(arr[0].type == "radio"){
+          state.frmData[dataIndex] = [];
+        }
+      }
+      //alert(JSON.stringify(arr));
+      // .forEach(el=> {
+      //   if(el.dataIndex === dataIndex){
+      //     frmData[e.dataIndex]
+      //   }
+      // })
+      console.info(dataIndex);
+    };
     const closeCheckEvent = (eq, val) => {
       console.info(eq, val);
       finalFilter();
@@ -168,12 +209,14 @@ export default defineComponent({
       state.keywords = "";
     };
     const onClickAway = event => {
+      state.show = false;
       console.log(event);
     };
     //
     initialize();
     return {
       ...toRefs(state),
+      clseTagEvent,
       closeCheckEvent,
       closeRadioEvent,
       closeTimeEvent,
