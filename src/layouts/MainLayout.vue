@@ -99,22 +99,12 @@
             <a-dropdown>
               <BarsOutlined />
               <template #overlay>
-                <a-menu>
-                  <a-menu-item @click="onTabsAction('closeLeftMenu')"
-                    >刷新当前页</a-menu-item
-                  >
-                  <a-menu-item @click="onTabsAction('closeLeftMenu')">
-                    关闭左边
-                  </a-menu-item>
-                  <a-menu-item @click="onTabsAction('closeRightMenu')"
-                    >关闭右边</a-menu-item
-                  >
-                  <a-menu-item @click="onTabsAction('closeAllMenu')"
-                    >关闭全部</a-menu-item
-                  >
-                  <a-menu-item @click="onTabsAction('closeRightMenu')"
-                    >关闭其他</a-menu-item
-                  >
+                <a-menu @click="onTabsAction">
+                  <a-menu-item key="refreshMenu">刷新当前页</a-menu-item>
+                  <a-menu-item key="closeLeftMenu">关闭左边 </a-menu-item>
+                  <a-menu-item key="closeRightMenu">关闭右边</a-menu-item>
+                  <a-menu-item key="closeAllMenu">关闭全部</a-menu-item>
+                  <a-menu-item key="closeOtherMenu">关闭其他</a-menu-item>
                 </a-menu>
               </template>
             </a-dropdown>
@@ -230,8 +220,9 @@ export default defineComponent({
       store.dispatch("menu/addMenu", item);
     };
     // 菜单操作事件 type= {"AllMenu", "OtherMenu", "RightMenu", "LeftMenu"}
-    const onTabsAction = type => {
-      store.dispatch("menu/" + type);
+    const onTabsAction = item => {
+      // alert(JSON.stringify(item));
+      store.dispatch("menu/" + item.key);
     };
     // 菜单操作事件
     const onTabsEdit = (key, evt) => {

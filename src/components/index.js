@@ -5,6 +5,7 @@ import DInput from "./DInput";
 import DTimeline from "./DTimeline";
 import DModifyPassword from "./DModifyPassword";
 import DProfile from "./DProfile";
+import DFilterBar from "./DFilterBar";
 // 暴露出来
 export {
   DMenu,
@@ -13,5 +14,6 @@ export {
   DInput,
   DTimeline,
   DModifyPassword,
-  DProfile
+  DProfile,
+  DFilterBar
 };

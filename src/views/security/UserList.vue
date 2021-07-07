@@ -54,6 +54,11 @@
     </a-page-header>
   </div>
   {{ searchData }}
+  <d-filter-bar
+    v-model="filter"
+    :options="options"
+    placeholder="请输入客户名 / 客户手机号等查询"
+  ></d-filter-bar>
   <!-- 头部内容end -->
   <div class="gm-container">
     <a-spin :spinning="loading" style="width: 100%">
@@ -117,13 +122,14 @@
 <script>
 import { reactive, ref, toRefs, onMounted } from "vue";
 import { DownOutlined, EditOutlined } from "@ant-design/icons-vue";
-import { DDrawer } from "@/components";
+import { DDrawer, DFilterBar } from "@/components";
 
 import userApi from "@/api/userApi";
 import UserForm from "./UserForm";
 import UserView from "./UserView";
 import { pager } from "@/library/Common";
 import { handleSimpleEvent } from "@/library/utils/Functions";
+
 export default {
   components: {
     //图标
@@ -131,6 +137,7 @@ export default {
     EditOutlined,
     // 组件
     DDrawer,
+    DFilterBar,
     UserForm,
     UserView
   },
@@ -144,13 +151,48 @@ export default {
       loading: true,
       dataList: [],
       pagination: pager, // 分页参数
-      searchData: {// 搜索条件结构
+      searchData: {
+        // 搜索条件结构
         created: "",
         userId: "",
         mobile: "",
         email: "",
         rangeDate: ""
-      }
+      },
+      options: [
+        {
+          label: "结算方式",
+          dataIndex: "payType",
+          defaultValue: ["1"],
+          type: "checkbox",
+          options: [
+            { label: "现金结算", value: "1" },
+            { label: "微信结算", value: "2" },
+            { label: "支付宝结算", value: "3" },
+            { label: "银行卡结算", value: "4" },
+            { label: "储值卡结算", value: "5" }
+          ]
+        },
+        {
+          label: "开单时间",
+          dataIndex: "startTime",
+          defaultValue: "2",
+          type: "radio",
+          options: [
+            { label: "今日", value: "1" },
+            { label: "本周", value: "2" },
+            { label: "本月", value: "3" },
+            { label: "上月", value: "4" },
+            { label: "本年", value: "5" }
+          ]
+        },
+        {
+          label: "自定义时间",
+          dataIndex: "endTime",
+          defaultValue: [],
+          type: "date-range-picker"
+        }
+      ]
     });
 
     // 编辑事件

@@ -7,8 +7,10 @@ import Axios from "@/library/Axios";
 import "ant-design-vue/dist/antd.css";
 import "@/assets/styles/styles.scss";
 import * as AntdIcons from "@ant-design/icons-vue";
+import VueClickAway from "vue3-click-away";
 //
 const app = createApp(App)
+  .use(VueClickAway)
   .use(store)
   .use(router)
   .use(Antd);

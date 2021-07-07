@@ -175,6 +175,7 @@ export default defineComponent({
       border: none;
       line-height: 1;
       border-radius: 0;
+      overflow: hidden;
       &:focus {
         outline: none;
         border: none;
