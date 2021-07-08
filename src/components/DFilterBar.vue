@@ -19,16 +19,31 @@
         :key="index"
       >
         <!-- 自定义时间 -->
-        <template v-if="filterItem.type == 'date-range-picker'">
-          <a-range-picker 
-            v-model:value="frmData[filterItem.dataIndex]"  
-            valueFormat="YYYY-MM-DD">
+        <template v-if="filterItem.type == 'date-picker'">
+          <a-date-picker
+            v-model:value="frmData[filterItem.dataIndex]"
+            valueFormat="YYYY-MM-DD"
+          >
+            <a-badge>{{ filterItem.label }}</a-badge>
+          </a-date-picker>
+        </template>
+        <!-- 日期范围 -->
+        <template v-else-if="filterItem.type == 'date-range-picker'">
+          <a-range-picker
+            v-model:value="frmData[filterItem.dataIndex]"
+            valueFormat="YYYY-MM-DD"
+          >
             <a-badge>{{ filterItem.label }}</a-badge>
           </a-range-picker>
         </template>
         <!-- 输入框 -->
         <template v-else-if="filterItem.type == 'input'">
-          <a-input size="small" v-model:value="frmData[filterItem.dataIndex]" :placeholder="filterItem.label"></a-input>
+          <a-input
+            size="small"
+            allow-clear
+            v-model:value="frmData[filterItem.dataIndex]"
+            :placeholder="filterItem.label"
+          ></a-input>
         </template>
         <a-popover
           v-else
@@ -37,7 +52,10 @@
         >
           <template v-slot:content>
             <!-- 多选 -->
-            <a-checkbox-group v-if="filterItem.type == 'checkbox'" v-model:value="frmData[filterItem.dataIndex]">
+            <a-checkbox-group
+              v-if="filterItem.type == 'checkbox'"
+              v-model:value="frmData[filterItem.dataIndex]"
+            >
               <a-row v-for="(item, i) in filterItem.options" :key="i">
                 <a-col>
                   <a-checkbox :value="item.value">{{ item.label }}</a-checkbox>
@@ -45,7 +63,10 @@
               </a-row>
             </a-checkbox-group>
             <!-- 单选 -->
-            <a-radio-group v-else-if="filterItem.type == 'radio'" v-model:value="frmData[filterItem.dataIndex]">
+            <a-radio-group
+              v-else-if="filterItem.type == 'radio'"
+              v-model:value="frmData[filterItem.dataIndex]"
+            >
               <a-row v-for="(item, i) in filterItem.options" :key="i">
                 <a-col>
                   <a-radio :value="item.value">{{ item.label }}</a-radio>
@@ -56,7 +77,8 @@
           <div>
             <a-badge
               :dot="
-                filterItem.type == 'radio' && frmData[filterItem.dataIndex].length > 0
+                filterItem.type == 'radio' &&
+                frmData[filterItem.dataIndex].length > 0
                   ? true
                   : false
               "
@@ -77,22 +99,35 @@
       <span v-for="(it, j) in options" :key="j">
         <span v-if="it.type == 'date-range-picker'">
           <span>
-            <a-tag 
-              closable 
-              v-if="frmData[it.dataIndex].length" 
-              @close.prevent="clseTagEvent(it.dataIndex)">
+            <a-tag
+              closable
+              v-if="frmData[it.dataIndex].length"
+              @close.prevent="clseTagEvent(it.dataIndex)"
+            >
               {{ frmData[it.dataIndex].join(" ~ ") }}
             </a-tag>
           </span>
         </span>
+        <span v-else-if="it.type == 'date-picker'">
+          <span>
+            <a-tag
+              closable
+              v-if="frmData[it.dataIndex].length"
+              @close.prevent="clseTagEvent(it.dataIndex)"
+            >
+              {{ frmData[it.dataIndex] }}
+            </a-tag>
+          </span>
+        </span>
         <span v-else-if="it.type == 'input'">
-          <a-tag 
-            closable 
-            v-if="frmData[it.dataIndex].length > 0" 
-            @close.prevent="clseTagEvent(it.dataIndex)">
+          <a-tag
+            closable
+            v-if="frmData[it.dataIndex].length > 0"
+            @close.prevent="clseTagEvent(it.dataIndex)"
+          >
             {{ frmData[it.dataIndex] }}
           </a-tag>
-        </span>  
+        </span>
         <span v-else>
           <template v-for="(sub, i) in it.options">
             <template v-if="it.type == 'checkbox'">
@@ -100,15 +135,20 @@
                 closable
                 :key="i"
                 @close.prevent="clseTagEvent(it.dataIndex)"
-                v-if="frmData[it.dataIndex].indexOf(sub.value) != -1">
-                {{ sub.label }}</a-tag>
+                v-if="frmData[it.dataIndex].indexOf(sub.value) != -1"
+              >
+                {{ sub.label }}</a-tag
+              >
             </template>
             <template v-else-if="it.type == 'radio'">
-              <a-tag 
-                closable 
+              <a-tag
+                closable
                 @close.prevent="clseTagEvent(it.dataIndex)"
-                :key="i" v-if="frmData[it.dataIndex] == sub.value">
-                {{ sub.label}}</a-tag>
+                :key="i"
+                v-if="frmData[it.dataIndex] == sub.value"
+              >
+                {{ sub.label }}</a-tag
+              >
             </template>
           </template>
         </span>
@@ -119,7 +159,7 @@
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs, watch } from "vue";
+import { defineComponent, reactive, toRefs, watch, computed } from "vue";
 import { SearchOutlined } from "@ant-design/icons-vue";
 export default defineComponent({
   name: "DFilterBar",
@@ -138,90 +178,60 @@ export default defineComponent({
       show: false,
       timer: null,
       hasTag: true,
-      frmData: { keywords: "" }
+      frmData: computed({
+        get() {
+          return props.value;
+        },
+        set(v) {
+          context.emit("update:value", v);
+        }
+      })
     });
     //
     // 观察
     watch(
-      () => props.options,
+      () => state.frmData,
       (newValue, oldValue) => {
         alert(newValue + " === " + oldValue);
       }
     );
     //方法
-    const finalFilter = () => {
-      let obj = {};
-      props.options.map(v => {
-        obj[v.dataIndex] = v.defaultValue;
-      });
-      obj[this.dataIndex] = this.keywords;
-      //this.$emit("input", obj);
-    };
-    // initialize
+    // 初始化
     const initialize = () => {
-      // alert(JSON.stringify(props.options));
       props.options.forEach(el => {
-        //alert(el.dataIndex);
         state.frmData[el.dataIndex] = el.defaultValue;
       });
     };
     // 事件
-    const clseTagEvent =(dataIndex) =>{
-      // alert(dataIndex);
-      let arr = props.options.filter(item =>{
+    const clseTagEvent = dataIndex => {
+      let arr = props.options.filter(item => {
         return item.dataIndex === dataIndex;
       });
-      //
-      if(arr.length == 1){
-        if(arr[0].type == "input"){
+      // 清空选择值
+      if (arr.length == 1) {
+        if (arr[0].type == "input") {
           state.frmData[dataIndex] = "";
-        }else if(arr[0].type == "date-range-picker"){
+        } else if (arr[0].type == "date-picker") {
+          state.frmData[dataIndex] = "";
+        } else if (arr[0].type == "date-range-picker") {
           state.frmData[dataIndex] = [];
-        }else if(arr[0].type == "checkbox"){
+        } else if (arr[0].type == "checkbox") {
           state.frmData[dataIndex] = [];
-         }else if(arr[0].type == "radio"){
-          state.frmData[dataIndex] = [];
+        } else if (arr[0].type == "radio") {
+          state.frmData[dataIndex] = "";
         }
       }
-      //alert(JSON.stringify(arr));
-      // .forEach(el=> {
-      //   if(el.dataIndex === dataIndex){
-      //     frmData[e.dataIndex]
-      //   }
-      // })
-      console.info(dataIndex);
+      // console.info(dataIndex);
     };
-    const closeCheckEvent = (eq, val) => {
-      console.info(eq, val);
-      finalFilter();
-    };
-    const closeRadioEvent = (eq, val) => {
-      console.info(eq, val);
-    };
-    const closeTimeEvent = val => {
-      console.info(val);
-    };
-    const changeDateEvent = val => {
-      console.info(val);
-    };
-    const cleanEmptyEvent = () => {
-      state.show = true;
-      state.keywords = "";
-    };
-    const onClickAway = event => {
+    const onClickAway = () => {
       state.show = false;
-      console.log(event);
+      // console.log(event);
     };
     //
     initialize();
     return {
       ...toRefs(state),
       clseTagEvent,
-      closeCheckEvent,
-      closeRadioEvent,
-      closeTimeEvent,
-      changeDateEvent,
-      cleanEmptyEvent,
       onClickAway
     };
   }
@@ -234,10 +244,13 @@ $input-bg: #fff;
   background: $input-bg;
   border-radius: 4px;
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+  border-bottom: 5px solid #424141;
+  margin-bottom: 10px;
   // overflow: hidden;
   .filter-tags {
     padding: 10px 20px;
     border-top: 1px solid #d5d5d5;
+    //background-color: seagreen;
   }
   .filter-search {
     font-size: 16px;

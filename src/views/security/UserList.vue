@@ -10,57 +10,17 @@
         <a-button key="3" @click="handleEditEvent('ADD')"
           ><FormOutlined />新增</a-button
         >
-        <a-tooltip title="点击显示查询条件" color="#f50">
-          <a-button @click="searchVisible = !searchVisible">
-            <SearchOutlined />
-            <DownOutlined v-if="!searchVisible" />
-            <UpOutlined v-if="searchVisible" />
-          </a-button>
-        </a-tooltip>
       </template>
-      <a-descriptions
-        v-if="searchVisible"
-        :column="{ xs: 4, sm: 8, md: 12 }"
-        layout="vertical"
-      >
-        <template #extra>
-          <a-radio-group>
-            <a-button type="danger" @click="onResetData"> 复原 </a-button>
-            <a-button type="primary" @click="onSearchData"> 搜索 </a-button>
-          </a-radio-group>
-        </template>
-        <a-descriptions-item label="创建时间">
-          <a-date-picker
-            v-model:value="searchData.created"
-            valueFormat="YYYY-MM-DD"
-          />
-        </a-descriptions-item>
-        <a-descriptions-item label="创建时间" :span="2">
-          <a-range-picker
-            v-model:value="searchData.rangeDate"
-            valueFormat="YYYY-MM-DD"
-          />
-        </a-descriptions-item>
-        <a-descriptions-item label="用户">
-          <a-input v-model:value="searchData.userId" placeholder="用户" />
-        </a-descriptions-item>
-        <a-descriptions-item label="手机号">
-          <a-input v-model:value="searchData.mobile" placeholder="手机号" />
-        </a-descriptions-item>
-        <a-descriptions-item label="邮箱">
-          <a-input v-model:value="searchData.email" placeholder="邮箱" />
-        </a-descriptions-item>
-      </a-descriptions>
     </a-page-header>
   </div>
   {{ searchData }}
-  <d-filter-bar
-    v-model="filter"
-    :options="options"
-    placeholder="请输入客户名 / 客户手机号等查询"
-  ></d-filter-bar>
   <!-- 头部内容end -->
   <div class="gm-container">
+    <d-filter-bar
+      v-model:value="searchData"
+      :options="searchOptions"
+      placeholder="请输入客户名 / 客户手机号等查询"
+    ></d-filter-bar>
     <a-spin :spinning="loading" style="width: 100%">
       <a-table
         :row-key="record => record.id"
@@ -146,24 +106,19 @@ export default {
       refViewWrap = ref();
     // Vue2.0中 data
     const state = reactive({
+      testData: {},
       formTitle: "",
       searchVisible: false,
       loading: true,
       dataList: [],
       pagination: pager, // 分页参数
-      searchData: {
+      searchData: {}, // 搜索
+      searchOptions: [
         // 搜索条件结构
-        created: "",
-        userId: "",
-        mobile: "",
-        email: "",
-        rangeDate: ""
-      },
-      options: [
         {
           label: "结算方式",
           dataIndex: "payType",
-          defaultValue: ["1"],
+          defaultValue: [],
           type: "checkbox",
           options: [
             { label: "现金结算", value: "1" },
@@ -173,11 +128,10 @@ export default {
             { label: "储值卡结算", value: "5" }
           ]
         },
-        
         {
           label: "开单时间",
           dataIndex: "startTime",
-          defaultValue: "2",
+          defaultValue: "",
           type: "radio",
           options: [
             { label: "今日", value: "1" },
@@ -186,6 +140,12 @@ export default {
             { label: "上月", value: "4" },
             { label: "本年", value: "5" }
           ]
+        },
+        {
+          label: "正常时间",
+          dataIndex: "noneTime",
+          defaultValue: "",
+          type: "date-picker"
         },
         {
           label: "自定义时间",
@@ -197,8 +157,14 @@ export default {
           label: "电子邮件",
           dataIndex: "email",
           defaultValue: "",
-          type: "input",
+          type: "input"
         },
+        {
+          label: "手机号",
+          dataIndex: "mobile",
+          defaultValue: "",
+          type: "input"
+        }
       ]
     });
 
@@ -270,19 +236,6 @@ export default {
     const refreshPage = () => {
       loadData();
     };
-    const onSearchData = () => {
-      state.pagination.current = 1;
-      loadData();
-    };
-    const onResetData = () => {
-      state.searchData = {
-        created: "",
-        userId: "",
-        mobile: "",
-        email: "",
-        rangeDate: ""
-      };
-    };
     // 加载事件
     onMounted(() => {
       loadData();
@@ -293,9 +246,7 @@ export default {
       handleEditEvent,
       refEditWrap,
       refViewWrap,
-      refreshPage,
-      onSearchData,
-      onResetData
+      refreshPage
     };
   }
 };
