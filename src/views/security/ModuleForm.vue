@@ -100,13 +100,13 @@ export default defineComponent({
       if (res.code == 0) {
         //let jsonDatas = JSON.parse(JSON.stringify(res.data));
         let jsonDatas = res.data;
-        for(let k in jsonDatas){
-          let json = { value: k*1, label: jsonDatas[k] };
+        for (let k in jsonDatas) {
+          let json = { value: k * 1, label: jsonDatas[k] };
           state.operateList.push(json);
         }
       }
-    })
-     
+    });
+
     // 表单绑定数据
     const frmModel = reactive({
       id: "", // ID
@@ -128,7 +128,7 @@ export default defineComponent({
       } else {
         let id = ret.data;
         console.info("frmModel.id == " + (frmModel.id == ""));
-        console.info("frmModel.id == " + ( id != frmModel.id));
+        console.info("frmModel.id == " + (id != frmModel.id));
         if (frmModel.id == "" || id != frmModel.id) {
           return Promise.reject("该编码已经被占用");
         }
@@ -147,7 +147,7 @@ export default defineComponent({
         {
           required: true,
           message: "请选择上级目录",
-          type: 'number'
+          type: "number"
         }
       ],
       code: [
@@ -163,7 +163,7 @@ export default defineComponent({
         {
           required: true,
           message: "请输入排序",
-          type: 'number'
+          type: "number"
         }
       ],
       type: [
@@ -182,11 +182,11 @@ export default defineComponent({
         {
           required: false,
           message: "请输入类型",
-          type: 'array'
+          type: "array"
         }
       ]
     });
-    
+
     // 表单
     const { resetFields, validate, validateInfos } = useForm(
       frmModel,

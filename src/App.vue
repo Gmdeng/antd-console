@@ -5,6 +5,7 @@
 </template>
 <script>
 import zh_CN from "ant-design-vue/lib/locale-provider/zh_CN";
+import { useStore } from "vuex";
 import moment from "moment";
 import "moment/locale/zh-cn";
 
@@ -12,6 +13,17 @@ moment.locale("zh-cn");
 export default {
   name: "App",
   setup() {
+    // 状态管理器
+    const store = useStore();
+    let menuStore = window.sessionStorage.getItem("MENU_STORE");
+    // 在页面加载时读取 sessionStorage
+    if (!(menuStore == "undefined")) {
+      store.replaceState(Object.assign({}, store.state, JSON.parse(menuStore)));
+    }
+    // 在页面刷新时将 store保存到sessionStorage里
+    window.addEventListener("beforeunload", () => {
+      window.sessionStorage.setItem("MENU_STORE", JSON.stringify(store.state));
+    });
     return {
       zh_CN
     };

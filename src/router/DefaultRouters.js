@@ -1,6 +1,8 @@
 import MainLayout from "@/layouts/MainLayout.vue";
-
-const routes = [
+/**
+ * 静态路由
+ */
+const staticRouters = [
   {
     path: "/home",
     name: "Home",
@@ -30,4 +32,4 @@ const routes = [
   }
 ];
 
-export default routes;
+export default staticRouters;

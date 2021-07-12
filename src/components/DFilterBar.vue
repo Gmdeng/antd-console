@@ -195,7 +195,7 @@ export default defineComponent({
         alert(newValue + " === " + oldValue);
       }
     );
-    //方法
+    // 方法
     // 初始化
     const initialize = () => {
       props.options.forEach(el => {

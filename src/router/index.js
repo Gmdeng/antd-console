@@ -40,6 +40,7 @@ const router = createRouter({
       component: () => import("../views/Demo.vue")
     },
     {
+      // 通配找不到的页面
       path: "/:pathMatch(.*)",
       redirect: "/notFound",
       hidden: true

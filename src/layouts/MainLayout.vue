@@ -127,7 +127,9 @@
   <!-- 修改密码 -->
   <d-modify-password ref="refModifyPassowdWrap"></d-modify-password>
   <!-- 个人信息 -->
-  <d-profile ref="refProfileWrap"></d-profile>
+  <d-drawer title="个人信息" ref="refProfileWrap" :footerVisible="false">
+    <profile></profile>
+  </d-drawer>
 </template>
 <script>
 import {
@@ -152,7 +154,8 @@ import {
 } from "@ant-design/icons-vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
-import { DModifyPassword, DProfile } from "@/components";
+import { DModifyPassword, DDrawer } from "@/components";
+import profile from "@/views/Profile";
 export default defineComponent({
   name: "MainLayout",
   components: {
@@ -166,7 +169,8 @@ export default defineComponent({
     MenuFoldOutlined,
     LogoutOutlined,
     DModifyPassword,
-    DProfile
+    DDrawer,
+    profile
   },
   setup(props, context) {
     context.attrs;
@@ -196,9 +200,8 @@ export default defineComponent({
     // 监听路由路劲, immediate 是否立即执行一次
     watch(
       () => route.path,
-      newValue => {
-        console.info("======================");
-        console.info(newValue);
+      (newValue, oldValue) => {
+        console.info(newValue + "======================" + oldValue);
       },
       { immediate: true }
     );
