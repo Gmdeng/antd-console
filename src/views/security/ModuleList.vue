@@ -11,7 +11,7 @@
       </template>
     </a-page-header>
   </div>
-  {{operateList}}
+  {{ operateList }}
   <!-- 头部内容end -->
   <div class="gm-container">
     <a-spin :spinning="loading" style="width: 100%">
@@ -151,43 +151,32 @@ export default {
     };
 
     // 加载数据列表
-    const loadData = param => {
+    const loadData = () => {
+      let param = {};
       state.loading = true;
       moduleApi
         .getDataListByPage(param)
         .then(res => {
           if (res.code == 0) {
-            // state.pagination.total = res.pager.totalRecord;
-            // state.pagination.pageSize = res.pager.pageSize;
             state.dataList = res.dataList;
             TreeCleanEmptyNode(state.dataList);
           }
           state.loading = false;
         })
         .catch(() => {
-          //alert(err);
           state.loading = false;
         });
-      moduleApi.getAllActions().then(res=>{
+      moduleApi.getAllActions().then(res => {
         state.operateList = res.data;
-      })
+      });
     };
     // 刷新页面
     const refreshPage = () => {
-      //alert(val + "=======" + txt);
-      let param = {
-        // pageSize: state.pagination.pageSize,
-        // current: state.pagination.current
-      };
-      loadData(param);
+      loadData();
     };
     // 页面加载事件
     onMounted(() => {
-      let param = {
-        // pageSize: state.pagination.pageSize,
-        // current: 1
-      };
-      loadData(param);
+      loadData();
     });
     return {
       ...toRefs(state),
