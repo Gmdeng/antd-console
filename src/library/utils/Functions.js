@@ -192,3 +192,18 @@ export function handleHttpResut(ret) {
   });
   return false;
 }
+
+/**
+ * let img = await getBase64(file.originFileObj)
+ * @param {*} file
+ * @returns
+ */
+const getBase64 = async file => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+};
+export { getBase64 };

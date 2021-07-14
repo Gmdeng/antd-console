@@ -11,7 +11,6 @@
       </template>
     </a-page-header>
   </div>
-  {{ operateList }}
   <!-- 头部内容end -->
   <div class="gm-container">
     <a-spin :spinning="loading" style="width: 100%">
@@ -26,8 +25,8 @@
           <template #default="{ record }">
             <a-dropdown>
               <a class="ant-dropdown-link" @click.prevent>
-                <EditOutlined />Edit
-                <DownOutlined />
+                <edit-outlined />Edit
+                <down-outlined />
               </a>
               <template #overlay>
                 <a-menu>
@@ -39,10 +38,6 @@
                   >
                   <a-menu-item @click="handleEditEvent('DELETE', record.id)"
                     >删除</a-menu-item
-                  >
-                  <a-menu-divider />
-                  <a-menu-item @click="handleEditEvent('AUDTH', record.id)"
-                    >审核</a-menu-item
                   >
                 </a-menu>
               </template>
@@ -66,7 +61,6 @@
 </template>
 <script>
 import { reactive, ref, toRefs, onMounted } from "vue";
-import { DownOutlined, EditOutlined } from "@ant-design/icons-vue";
 import { DDrawer } from "@/components";
 import {
   handleSimpleEvent,
@@ -77,9 +71,6 @@ import CatalogForm from "./CatalogForm";
 import CatalogView from "./CatalogView";
 export default {
   components: {
-    //图标
-    DownOutlined,
-    EditOutlined,
     // 组件
     DDrawer,
     CatalogForm,
@@ -112,13 +103,6 @@ export default {
           "删除",
           catalogApi.deleteData,
           { catalogId: data },
-          refreshPage
-        );
-      } else if (type == "AUDTH") {
-        handleSimpleEvent(
-          "审核",
-          catalogApi.authData,
-          { catalogId: data, status: 1 },
           refreshPage
         );
       }
