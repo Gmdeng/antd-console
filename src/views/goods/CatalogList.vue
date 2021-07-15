@@ -48,6 +48,7 @@
           </template>
         </a-table-column>
         <a-table-column key="name" title="名称" data-index="name" />
+        <a-table-column key="keywords" title="关键词" data-index="idx" />
         <a-table-column key="idx" title="排序" data-index="idx" />
       </a-table>
     </a-spin>

@@ -13,14 +13,16 @@
           </a-tree-select>
         </a-form-item>
         <a-form-item label="缩略图">
+          {{ fileData }}
           <a-input v-model:value="frmModel.thumb" placeholder="请输入缩略图" />
           <a-upload
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            action="http://localhost:9999/api/Upload/doUpload/image"
             list-type="picture-card"
             v-model:file-list="fileList"
             @preview="handlePreview"
             @change="handleChange"
             :beforeUpload="handleBeforeUpload"
+            accept=".jpg,.png"
           >
             <div v-if="fileList.length < 8">
               <plus-outlined />
@@ -80,7 +82,11 @@ import {
 
 import catalogApi from "@/api/catalogApi";
 import { useForm } from "@ant-design-vue/use";
-import { limitNumber, handleHttpResut, getBase64 } from "@/library/utils/Functions";
+import {
+  limitNumber,
+  handleHttpResut,
+  getBase64
+} from "@/library/utils/Functions";
 export default defineComponent({
   name: "CatalogForm",
   setup() {
@@ -95,6 +101,7 @@ export default defineComponent({
       previewVisible: false,
       previewImage: null,
       dsTreeData: [],
+      fileData: null,
       fileList: [
         {
           uid: "-1",
@@ -109,25 +116,6 @@ export default defineComponent({
           status: "done",
           url:
             "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-        },
-        {
-          uid: "-3",
-          name: "image.png",
-          status: "done",
-          url:
-            "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-        },
-        {
-          uid: "-4",
-          name: "image.png",
-          status: "done",
-          url:
-            "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-        },
-        {
-          uid: "-5",
-          name: "image.png",
-          status: "error"
         }
       ]
     });
@@ -231,10 +219,12 @@ export default defineComponent({
       state.previewVisible = false;
     };
     const handleChange = async ({ file, fileList }) => {
-      alert("handleChange ===" + JSON.stringify(fileList));
-      // alert(JSON.stringify(file));
+      state.fileData = file;
+      console.info("handleChange ===" + JSON.stringify(file));
+      console.info("handleChange ===" + JSON.stringify(fileList));
+      // alert(JSON.stringify(event));
       let img = await getBase64(file.originFileObj);
-      alert(img);
+      console.info(img);
     };
     const handleBeforeUpload = file => {
       const isJpgOrPng =
