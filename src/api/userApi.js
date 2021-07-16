@@ -31,7 +31,7 @@ export default {
   },
   /**
    * 审核
-   * @param {moduleId:157, status:0} formData
+   * @param {*} formData
    * @returns
    */
   authData(formData) {
@@ -40,7 +40,7 @@ export default {
 
   /**
    * 删除
-   * @param {moduleId:157} formData
+   * @param {*} formData
    * @returns
    */
   deleteData(formData) {
