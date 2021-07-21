@@ -1,18 +1,24 @@
 <template>
-  <div class="filterbox" v-click-away="onClickAway">
-    <a-input
-      size="large"
-      class="filter-input"
-      allow-clear
-      @focus="show = true"
-      v-model:value="frmData.keywords"
-      :placeholder="placeholder"
-    >
-      <template #prefix>
-        <SearchOutlined class="filter-search" />
-      </template>
-    </a-input>
-    <div class="filterbox-group" v-show="show" :key="1">
+  <div class="filterbox">
+    <div class="filterbox-input">
+      <a-input
+        size="large"
+        class="filter-input"
+        allow-clear
+        v-model:value="frmData.keywords"
+        :placeholder="placeholder"
+      >
+        <template #prefix>
+          <SearchOutlined class="filter-search" />
+        </template>
+        <template #suffix>
+          <a-button type="primary" @click="onSearchEvent" size="large">
+            Search
+          </a-button>
+        </template>
+      </a-input>
+    </div>
+    <div class="filterbox-group" :key="1">
       <div
         class="filterbox-item"
         v-for="(filterItem, index) in options"
@@ -23,6 +29,7 @@
           <a-date-picker
             v-model:value="frmData[filterItem.dataIndex]"
             valueFormat="YYYY-MM-DD"
+            @focus="show = true"
           >
             <a-badge>{{ filterItem.label }}</a-badge>
           </a-date-picker>
@@ -32,6 +39,7 @@
           <a-range-picker
             v-model:value="frmData[filterItem.dataIndex]"
             valueFormat="YYYY-MM-DD"
+            @focus="show = true"
           >
             <a-badge>{{ filterItem.label }}</a-badge>
           </a-range-picker>
@@ -134,7 +142,7 @@
               <a-tag
                 closable
                 :key="i"
-                @close.prevent="clseTagEvent(it.dataIndex)"
+                @close.prevent="clseTagEvent(it.dataIndex, sub.value)"
                 v-if="frmData[it.dataIndex].indexOf(sub.value) != -1"
               >
                 {{ sub.label }}</a-tag
@@ -171,9 +179,15 @@ export default defineComponent({
       default: null
     },
     value: [Object, {}]
+    // onSearch: {
+    //   type: Function,
+    //   default: () => {
+    //     alert("No Refresh Data");
+    //   }
+    // }
   },
   setup(props, context) {
-    console.info(context);
+    // console.info(context);
     const state = reactive({
       show: false,
       timer: null,
@@ -203,7 +217,7 @@ export default defineComponent({
       });
     };
     // 事件
-    const clseTagEvent = dataIndex => {
+    const clseTagEvent = (dataIndex, idx) => {
       let arr = props.options.filter(item => {
         return item.dataIndex === dataIndex;
       });
@@ -216,7 +230,16 @@ export default defineComponent({
         } else if (arr[0].type == "date-range-picker") {
           state.frmData[dataIndex] = [];
         } else if (arr[0].type == "checkbox") {
-          state.frmData[dataIndex] = [];
+          // alert(idx);
+          // alert(JSON.stringify(state.frmData[dataIndex]));
+          for (var i = 0; i < state.frmData[dataIndex].length; i++) {
+            // alert(state.frmData[dataIndex][i]);
+            if (state.frmData[dataIndex][i] == idx) {
+              state.frmData[dataIndex].splice(i, 1);
+              break;
+            }
+          }
+          // state.frmData[dataIndex] = [];
         } else if (arr[0].type == "radio") {
           state.frmData[dataIndex] = "";
         }
@@ -227,12 +250,16 @@ export default defineComponent({
       state.show = false;
       // console.log(event);
     };
+    const onSearchEvent = () => {
+      context.emit("onSearch");
+    };
     //
     initialize();
     return {
       ...toRefs(state),
       clseTagEvent,
-      onClickAway
+      onClickAway,
+      onSearchEvent
     };
   }
 });

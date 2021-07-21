@@ -19,7 +19,8 @@
     <d-filter-bar
       v-model:value="searchData"
       :options="searchOptions"
-      placeholder="请输入客户名 / 客户手机号等查询"
+      @onSearch="refreshPage"
+      placeholder="请输入客户名 / 客户手机号查询"
     ></d-filter-bar>
     <a-spin :spinning="loading" style="width: 100%">
       <a-table
@@ -212,8 +213,10 @@ export default {
     const loadData = () => {
       state.loading = true;
       let param = {
-        pageSize: state.pagination.pageSize,
-        current: state.pagination.current
+        pager: {
+          pageSize: state.pagination.pageSize,
+          indexPage: state.pagination.current
+        }
       };
       Object.assign(param, state.searchData);
       //
