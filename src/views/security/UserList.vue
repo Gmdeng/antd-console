@@ -13,7 +13,6 @@
       </template>
     </a-page-header>
   </div>
-  {{ searchData }}
   <!-- 头部内容end -->
   <div class="gm-container">
     <d-filter-bar
@@ -237,6 +236,7 @@ export default {
     };
     // 刷新页面
     const refreshPage = () => {
+      state.pagination.current = 1;
       loadData();
     };
     // 加载事件

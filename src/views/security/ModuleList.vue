@@ -11,7 +11,6 @@
       </template>
     </a-page-header>
   </div>
-  {{ operateList }}
   <!-- 头部内容end -->
   <div class="gm-container">
     <a-spin :spinning="loading" style="width: 100%">
@@ -54,7 +53,6 @@
         </a-table-column>
         <a-table-column key="code" title="编码" data-index="code" />
         <a-table-column key="name" title="名称" data-index="name" />
-        <a-table-column key="type" title="类型" data-index="type" />
         <a-table-column key="icon" title="图标" data-index="icon">
           <template #default="{ record }">
             <component :is="$AntdIcons[record.icon]" />

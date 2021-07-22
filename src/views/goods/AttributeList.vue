@@ -113,59 +113,7 @@ export default {
       dataList: [],
       pagination: pager, // 分页参数
       searchData: {}, // 搜索
-      searchOptions: [
-        // 搜索条件结构
-        {
-          label: "结算方式",
-          dataIndex: "payType",
-          defaultValue: [],
-          type: "checkbox",
-          options: [
-            { label: "现金结算", value: "1" },
-            { label: "微信结算", value: "2" },
-            { label: "支付宝结算", value: "3" },
-            { label: "银行卡结算", value: "4" },
-            { label: "储值卡结算", value: "5" }
-          ]
-        },
-        {
-          label: "开单时间",
-          dataIndex: "startTime",
-          defaultValue: "",
-          type: "radio",
-          options: [
-            { label: "今日", value: "1" },
-            { label: "本周", value: "2" },
-            { label: "本月", value: "3" },
-            { label: "上月", value: "4" },
-            { label: "本年", value: "5" }
-          ]
-        },
-        {
-          label: "正常时间",
-          dataIndex: "noneTime",
-          defaultValue: "",
-          type: "date-picker"
-        },
-        {
-          label: "自定义时间",
-          dataIndex: "endTime",
-          defaultValue: [],
-          type: "date-range-picker"
-        },
-        {
-          label: "电子邮件",
-          dataIndex: "email",
-          defaultValue: "",
-          type: "input"
-        },
-        {
-          label: "手机号",
-          dataIndex: "mobile",
-          defaultValue: "",
-          type: "input"
-        }
-      ]
+      searchOptions: []
     });
 
     // 编辑事件
@@ -184,13 +132,6 @@ export default {
           "删除",
           attributeApi.deleteData,
           { id: data },
-          refreshPage
-        );
-      } else if (type == "AUDTH") {
-        handleSimpleEvent(
-          "审核",
-          attributeApi.authData,
-          { id: data, status: 1 },
           refreshPage
         );
       }
@@ -234,6 +175,7 @@ export default {
     };
     // 刷新页面
     const refreshPage = () => {
+      state.pagination.current = 1;
       loadData();
     };
     // 加载事件
