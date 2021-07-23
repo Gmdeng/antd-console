@@ -6,7 +6,7 @@
         :wrapper-col="{ span: 14 }"
         :scrollToFirstError="true"
       >
-         <a-form-item label="商品分类" v-bind="validateInfos.catalogId">
+        <a-form-item label="商品分类" v-bind="validateInfos.catalogId">
           <a-tree-select
             v-model:value="frmModel.catalogId"
             size="large"
@@ -29,6 +29,25 @@
             placeholder="请输入排序"
           />
         </a-form-item>
+        <a-form-item label="选项值" v-bind="validateInfos.idx">
+          <a-input
+            v-model:value="frmModel.options"
+            placeholder="please input domain"
+            style="width: 60%; margin-right: 8px"
+          />
+          <MinusCircleOutlined
+            v-if="frmModel.options.length > 1"
+            class="dynamic-delete-button"
+            :disabled="frmModel.options.length === 1"
+            @click="removeDomain(domain)"
+          />
+        </a-form-item>
+        <a-form-item label=" ">
+          <a-button type="dashed" style="width: 60%" @click="addDomain">
+            <PlusOutlined />
+            Add field
+          </a-button>
+        </a-form-item>
       </a-form>
     </a-col>
   </a-row>
@@ -42,12 +61,17 @@ import {
   toRaw,
   toRefs
 } from "vue";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons-vue";
 import attributeApi from "@/api/attributeApi";
 import catalogApi from "@/api/catalogApi";
 import { useForm } from "@ant-design-vue/use";
 import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
 export default defineComponent({
   name: "UserForm",
+  components: {
+    MinusCircleOutlined,
+    PlusOutlined
+  },
   setup() {
     /*** 上层接口==============================================*/
     const interEvtSubmit = inject("interEvtSubmit");
@@ -70,35 +94,37 @@ export default defineComponent({
     // 表单绑定数据
     const frmModel = reactive({
       id: "", // ID
-      userId: "", // 用户名
-      petName: "", // 昵称
-      mobile: "", // 手机号
-      email: "", // 邮箱
-      allowIpaddr: "", // 允许登录IP
-      denyIpaddr: "", // 拒绝登录IP
-      notes: "", // 描述,
-      roles: []
+      catalogId: "", // 用分类ID
+      name: "", // 属性名称
+      idx: 0, // 排序
+      options: []
     });
 
     // 表单验证
     const rulesRef = reactive({
-      userId: [
+      catalogId: [
         {
           required: true,
-          message: "请输入用户名"
+          message: "请选择分类"
         }
       ],
-      petName: [
+      name: [
         {
           required: true,
-          message: "请输入昵称"
+          message: "请输入属性名称"
         }
       ],
-      roles: [
+      idx: [
+        {
+          required: true,
+          message: "请输入排序"
+        }
+      ],
+      options: [
         {
           type: "array",
           required: true,
-          message: "请选择角色"
+          message: "请选择增加选项值"
         }
       ]
     });
