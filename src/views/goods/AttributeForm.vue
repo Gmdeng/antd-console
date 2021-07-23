@@ -2,58 +2,31 @@
   <a-row :gutter="24">
     <a-col :sm="24" :md="12" :xl="12">
       <a-form
-        :label-col="labelCol"
-        :wrapper-col="wrapperCol"
+        :label-col="{ span: 4 }"
+        :wrapper-col="{ span: 14 }"
         :scrollToFirstError="true"
       >
-        <a-form-item label="用户名" v-bind="validateInfos.userId">
-          <a-input v-model:value="frmModel.userId" placeholder="请输入用户名" />
-        </a-form-item>
-        <a-form-item label="昵称" v-bind="validateInfos.petName">
-          <a-input v-model:value="frmModel.petName" placeholder="请输入昵称" />
-        </a-form-item>
-        <a-form-item label="手机号" v-bind="validateInfos.mobile">
-          <a-input v-model:value="frmModel.mobile" placeholder="请输入手机号" />
-        </a-form-item>
-        <a-form-item label="邮箱" v-bind="validateInfos.email">
-          <a-input v-model:value="frmModel.email" placeholder="请输入邮箱" />
-        </a-form-item>
-        <a-form-item label="角色" v-bind="validateInfos.roles">
-          <a-select
-            mode="multiple"
-            placeholder="请选择角色"
-            v-model:value="frmModel.roles"
+         <a-form-item label="商品分类" v-bind="validateInfos.catalogId">
+          <a-tree-select
+            v-model:value="frmModel.catalogId"
+            size="large"
+            :tree-data="dsTreeData"
+            placeholder="请选择商品分类"
+            tree-default-expand-all
           >
-            <a-select-option v-for="it in roleList" :key="it.id">
-              {{ it.name }}
-            </a-select-option>
-          </a-select>
+          </a-tree-select>
         </a-form-item>
-        <a-form-item label="允许登录IP" v-bind="validateInfos.allowIpaddr">
-          <a-textarea
-            v-model:value="frmModel.allowIpaddr"
-            placeholder="允许登录IP, 优先于拒绝"
-            :auto-size="{ minRows: 2, maxRows: 5 }"
-            showCount
-            :maxlength="100"
-          />
+        <a-form-item label="属性名称" v-bind="validateInfos.name">
+          <a-input v-model:value="frmModel.name" placeholder="请输入属性名称" />
         </a-form-item>
-        <a-form-item label="拒绝登录IP" v-bind="validateInfos.denyIpaddr">
-          <a-textarea
-            v-model:value="frmModel.denyIpaddr"
-            placeholder="拒绝登录IP"
-            :auto-size="{ minRows: 2, maxRows: 5 }"
-            showCount
-            :maxlength="100"
-          />
-        </a-form-item>
-        <a-form-item label="备注" v-bind="validateInfos.remarks">
-          <a-textarea
-            v-model:value="frmModel.remarks"
-            placeholder="备注说明"
-            :auto-size="{ minRows: 2, maxRows: 5 }"
-            showCount
-            :maxlength="100"
+        <a-form-item label="排序" v-bind="validateInfos.idx">
+          <a-input-number
+            v-model:value="frmModel.idx"
+            :precision="0"
+            :formatter="limitNumber"
+            :parser="limitNumber"
+            :min="0"
+            placeholder="请输入排序"
           />
         </a-form-item>
       </a-form>
@@ -69,9 +42,8 @@ import {
   toRaw,
   toRefs
 } from "vue";
-import userApi from "@/api/userApi";
-import roleApi from "@/api/roleApi";
-import validatorApi from "@/api/validatorApi";
+import attributeApi from "@/api/attributeApi";
+import catalogApi from "@/api/catalogApi";
 import { useForm } from "@ant-design-vue/use";
 import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
 export default defineComponent({
@@ -85,9 +57,16 @@ export default defineComponent({
     /*** 接口============================================== end */
     // 定义变量名称
     const state = reactive({
-      roleList: []
+      dsTreeData: []
     });
-
+    //获取父级选项
+    catalogApi.getTreeSelects().then(res => {
+      if (res.code == 0) {
+        state.dsTreeData = [];
+        state.dsTreeData.push(res.data);
+        //alert(JSON.stringify(res.data));
+      }
+    });
     // 表单绑定数据
     const frmModel = reactive({
       id: "", // ID
@@ -101,38 +80,12 @@ export default defineComponent({
       roles: []
     });
 
-    // 获取所有可用的角色
-    roleApi.getAvailableRoleNames().then(res => {
-      if (res.code == 0) {
-        //console.info(res.data);
-        state.roleList = res.data;
-      }
-    });
-
-    // 验证编码唯一性
-    const validateUserId = async (rule, value) => {
-      let ret = await validatorApi.getCheckUserUniqueUID(value);
-      if (ret.code == 0) {
-        return Promise.resolve();
-      } else {
-        let id = ret.data;
-        if (frmModel.id == "" || id != frmModel.id) {
-          return Promise.reject("该编码已经被占用");
-        }
-      }
-      return Promise.resolve();
-    };
-
     // 表单验证
     const rulesRef = reactive({
       userId: [
         {
           required: true,
           message: "请输入用户名"
-        },
-        {
-          validator: validateUserId,
-          trigger: "change" // blur change
         }
       ],
       petName: [
@@ -161,7 +114,7 @@ export default defineComponent({
         let data = await validate();
         // console.log(toRaw(frmModel));
         console.log(data);
-        let result = await userApi.saveData(toRaw(frmModel));
+        let result = await attributeApi.saveData(toRaw(frmModel));
         return handleHttpResut(result);
       } catch (err) {
         console.error("error", err);
@@ -176,7 +129,7 @@ export default defineComponent({
 
     // 初始化表单
     const initFormData = () => {
-      userApi.getFormData(frmModel.id).then(res => {
+      attributeApi.getFormData(frmModel.id).then(res => {
         if (res.code == 0) {
           Object.assign(frmModel, res.data);
           interEvtCloseLoad();
@@ -196,8 +149,6 @@ export default defineComponent({
     });
     return {
       ...toRefs(state),
-      labelCol: { span: 4 },
-      wrapperCol: { span: 14 },
       limitNumber,
       frmModel,
       validateInfos

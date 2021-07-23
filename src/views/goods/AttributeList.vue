@@ -4,7 +4,7 @@
       class="demo-page-header"
       style="border: 1px solid rgb(235, 237, 240)"
       title="商品属性管理"
-      sub-title="User Management "
+      sub-title="Attribute Management "
     >
       <template #extra>
         <a-button key="3" @click="handleEditEvent('ADD')"
@@ -13,13 +13,13 @@
       </template>
     </a-page-header>
   </div>
-  {{ searchData }}
   <!-- 头部内容end -->
   <div class="gm-container">
     <d-filter-bar
       v-model:value="searchData"
       :options="searchOptions"
-      placeholder="请输入客户名 / 客户手机号等查询"
+      @onSearch="refreshPage"
+      placeholder="请输入属性名称查询"
     ></d-filter-bar>
     <a-spin :spinning="loading" style="width: 100%">
       <a-table
@@ -47,10 +47,6 @@
                   <a-menu-item @click="handleEditEvent('DELETE', record.id)">
                     删除
                   </a-menu-item>
-                  <a-menu-divider />
-                  <a-menu-item @click="handleEditEvent('AUDTH', record.id)"
-                    >审核</a-menu-item
-                  >
                 </a-menu>
               </template>
             </a-dropdown>
@@ -59,16 +55,14 @@
             </span>
           </template>
         </a-table-column>
-        <a-table-column key="userId" title="用户名" data-index="userId" />
-        <a-table-column key="petName" title="昵称" data-index="petName" />
-        <a-table-column key="mobile" title="手机号" data-index="mobile" />
-        <a-table-column key="email" title="邮箱" data-index="email" />
-        <a-table-column key="status" title="状态" data-index="status" />
-        <a-table-column key="create" title="创建时间/人">
-          <template #default="{ record }">
-            {{ record.createOn }}/{{ record.createBy }}
-          </template>
-        </a-table-column>
+        <a-table-column
+          key="catalogId"
+          title="所属分类"
+          data-index="catalogId"
+        />
+        <a-table-column key="name" title="属性名称" data-index="name" />
+        <a-table-column key="idx" title="排序" data-index="idx" />
+        <a-table-column key="values" title="属性值项" data-index="values" />
       </a-table>
     </a-spin>
   </div>

@@ -2,8 +2,8 @@
   <a-row :gutter="24">
     <a-col :sm="24" :md="12" :xl="12">
       <a-form
-        :label-col="labelCol"
-        :wrapper-col="wrapperCol"
+        :label-col="{ span: 4 }"
+        :wrapper-col="{ span: 14 }"
         :scrollToFirstError="true"
       >
         <a-form-item label="用户名" v-bind="validateInfos.userId">
@@ -70,7 +70,6 @@ import {
   toRefs
 } from "vue";
 import brandApi from "@/api/brandApi";
-import validatorApi from "@/api/validatorApi";
 import { useForm } from "@ant-design-vue/use";
 import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
 export default defineComponent({
@@ -96,30 +95,12 @@ export default defineComponent({
       summary: "" // 简介
     });
 
-    // 验证编码唯一性
-    const validateUserId = async (rule, value) => {
-      let ret = await validatorApi.getCheckUserUniqueUID(value);
-      if (ret.code == 0) {
-        return Promise.resolve();
-      } else {
-        let id = ret.data;
-        if (frmModel.id == "" || id != frmModel.id) {
-          return Promise.reject("该编码已经被占用");
-        }
-      }
-      return Promise.resolve();
-    };
-
     // 表单验证
     const rulesRef = reactive({
       userId: [
         {
           required: true,
           message: "请输入用户名"
-        },
-        {
-          validator: validateUserId,
-          trigger: "change" // blur change
         }
       ],
       petName: [
@@ -183,8 +164,6 @@ export default defineComponent({
     });
     return {
       ...toRefs(state),
-      labelCol: { span: 4 },
-      wrapperCol: { span: 14 },
       limitNumber,
       frmModel,
       validateInfos
