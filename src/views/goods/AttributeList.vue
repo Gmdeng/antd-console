@@ -10,6 +10,9 @@
         <a-button key="3" @click="handleEditEvent('ADD')"
           ><FormOutlined />新增</a-button
         >
+        <a-button key="3" @click="handleEditEvent('VIEW', 33)"
+          ><FormOutlined />查看</a-button
+        >
       </template>
     </a-page-header>
   </div>

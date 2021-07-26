@@ -1,109 +1,156 @@
 <template>
-  <a-descriptions title="用户信息 User Info" bordered>
-    <a-descriptions-item label="用户名">
-      {{ frmModel.userId }}
-    </a-descriptions-item>
-    <a-descriptions-item label="昵称">
-      {{ frmModel.petName }}
-    </a-descriptions-item>
-    <a-descriptions-item label="状态">
-      <a-tag color="cyan">{{ frmModel.status }}</a-tag>
-    </a-descriptions-item>
-    <a-descriptions-item label="手机号">
-      {{ frmModel.mobile }}
-    </a-descriptions-item>
-    <a-descriptions-item label="邮箱" :span="2">
-      {{ frmModel.email }}
-    </a-descriptions-item>
-    <a-descriptions-item label="角色" :span="3">
-      <a-tag color="cyan" v-for="(it, key) in frmModel.roles" :key="key">
-        {{ it.name }}
-      </a-tag>
-    </a-descriptions-item>
-    <a-descriptions-item label="允许登录IP" :span="3">
-      {{ frmModel.allowIpaddr }}
-    </a-descriptions-item>
-    <a-descriptions-item label="拒绝登录IP" :span="3">
-      {{ frmModel.denyIpaddr }}
-    </a-descriptions-item>
-    <a-descriptions-item label="备注" :span="3">
-      {{ frmModel.remarks }}
-    </a-descriptions-item>
-    <a-descriptions-item label="更新人/时间">
-      {{ frmModel.updateBy }} /{{ frmModel.updateOn }}
-    </a-descriptions-item>
-    <a-descriptions-item label="创建人/时间">
-      {{ frmModel.createBy }} /{{ frmModel.createOn }}
-    </a-descriptions-item>
-  </a-descriptions>
-
-  <a-space>
-    <a-date-picker
-      show-time
-      placeholder="Select Time"
-      @change="onChange"
-      @ok="onOk"
-    />
-    <a-range-picker
-      :show-time="{ format: 'HH:mm' }"
-      format="YYYY-MM-DD HH:mm"
-      :placeholder="['Start Time', 'End Time']"
-      @change="onChange"
-      @ok="onOk"
-    />
-  </a-space>
+  <a-form :model="frmModel" v-bind="formItemLayoutWithOutLabel">
+    <a-form-item
+      v-for="(option, index) in frmModel.options"
+      :key="option.key"
+      v-bind="index === 0 ? formItemLayout : {}"
+      :label="index === 0 ? 'Domains' : ''"
+      :name="['options', index, 'value']"
+      :rules="{
+        required: true,
+        message: 'domain can not be null',
+        trigger: 'change'
+      }"
+    >
+      <a-input
+        v-model:value="option.value"
+        placeholder="please input domain"
+        style="width: 40%; margin-right: 8px"
+      />
+      <a-input
+        v-model:value="option.key"
+        placeholder="please input domain"
+        style="width: 40%; margin-right: 8px"
+      />
+      <MinusCircleOutlined
+        v-if="frmModel.options.length > 1"
+        class="dynamic-delete-button"
+        :disabled="frmModel.options.length === 1"
+        @click="removeDomain(option)"
+      />
+    </a-form-item>
+    <a-form-item v-bind="formItemLayoutWithOutLabel">
+      <a-button type="dashed" style="width: 60%" @click="addDomain">
+        <PlusOutlined />
+        Add field
+      </a-button>
+    </a-form-item>
+    <a-form-item v-bind="formItemLayoutWithOutLabel">
+      <a-button type="primary" html-type="submit" @click="submitForm"
+        >Submit</a-button
+      >
+      <a-button style="margin-left: 10px" @click="resetForm">Reset</a-button>
+    </a-form-item>
+  </a-form>
 </template>
 <script>
-import { defineComponent, reactive, inject, onMounted, toRefs } from "vue";
-import userApi from "@/api/userApi";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons-vue";
+import { defineComponent, reactive, inject } from "vue";
+import { useForm } from "@ant-design-vue/use";
 export default defineComponent({
-  name: "UserView",
   setup() {
-    /*** 上层接口==============================================*/
-    const interData = inject("interData");
     const interEvtCloseLoad = inject("interEvtCloseLoad");
-    /*** 接口============================================== end */
-    // 定义变量名称
-    const state = reactive({});
-
-    // 表单绑定数据
+    const formItemLayout = {
+      labelCol: {
+        xs: {
+          span: 24
+        },
+        sm: {
+          span: 4
+        }
+      },
+      wrapperCol: {
+        xs: {
+          span: 24
+        },
+        sm: {
+          span: 20
+        }
+      }
+    };
+    const formItemLayoutWithOutLabel = {
+      wrapperCol: {
+        xs: {
+          span: 24,
+          offset: 0
+        },
+        sm: {
+          span: 20,
+          offset: 4
+        }
+      }
+    };
     const frmModel = reactive({
       id: "", // ID
-      userId: "", // 用户名
-      petName: "", // 昵称
-      mobile: "", // 手机号
-      email: "", // 邮箱
-      allowIpaddr: "", // 允许登录IP
-      denyIpaddr: "", // 拒绝登录IP
-      notes: "", // 描述,
-      roles: [] // 角色
+      catalogId: "", // 用分类ID
+      name: "", // 属性名称
+      idx: 0, // 排序
+      options: [{ name: "", notes: "" }]
     });
 
-    // 初始化表单
-    const initFormData = () => {
-      userApi.getDetail(frmModel.id).then(res => {
-        if (res.code == 0) {
-          Object.assign(frmModel, res.data);
-          interEvtCloseLoad();
-        }
+    // 表单验证
+    const rulesRef = reactive({});
+    const { resetFields, validate } = useForm(frmModel, rulesRef);
+    const submitForm = () => {
+      validate()
+        .then(() => {
+          console.log("values", frmModel.domains);
+        })
+        .catch(error => {
+          console.log("error", error);
+        });
+    };
+
+    const resetForm = () => {
+      resetFields();
+    };
+
+    const removeDomain = item => {
+      let index = frmModel.options.indexOf(item);
+
+      if (index !== -1) {
+        frmModel.options.splice(index, 1);
+      }
+    };
+
+    const addDomain = () => {
+      frmModel.options.push({
+        value: "",
+        key: Date.now()
       });
     };
-
-    // 加载初始化数据
-    onMounted(() => {
-      if (interData.value == undefined) {
-        interEvtCloseLoad();
-      } else {
-        frmModel.id = interData.value;
-        initFormData();
-      }
-    });
+    interEvtCloseLoad();
     return {
-      ...toRefs(state),
-      labelCol: { span: 4 },
-      wrapperCol: { span: 14 },
-      frmModel
+      formItemLayout,
+      formItemLayoutWithOutLabel,
+      frmModel,
+      submitForm,
+      resetForm,
+      removeDomain,
+      addDomain
     };
+  },
+
+  components: {
+    MinusCircleOutlined,
+    PlusOutlined
   }
 });
 </script>
+<style>
+.dynamic-delete-button {
+  cursor: pointer;
+  position: relative;
+  top: 4px;
+  font-size: 24px;
+  color: #999;
+  transition: all 0.3s;
+}
+.dynamic-delete-button:hover {
+  color: #777;
+}
+.dynamic-delete-button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+</style>

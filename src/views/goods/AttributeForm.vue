@@ -1,9 +1,10 @@
 <template>
+  {{ demoData }}
   <a-row :gutter="24">
     <a-col :sm="24" :md="12" :xl="12">
       <a-form
+        :model="frmModel"
         :label-col="{ span: 4 }"
-        :wrapper-col="{ span: 14 }"
         :scrollToFirstError="true"
       >
         <a-form-item label="商品分类" v-bind="validateInfos.catalogId">
@@ -29,24 +30,50 @@
             placeholder="请输入排序"
           />
         </a-form-item>
-        <a-form-item label="选项值" v-bind="validateInfos.idx">
+        <a-form-item
+          v-for="(it, idx) in frmModel.options"
+          :key="idx"
+          :label="idx === 0 ? '选项值' : ' '"
+          :name="['options', idx, 'name']"
+          :rules="{
+            required: true,
+            message: '选项值不能为空'
+          }"
+        >
           <a-input
-            v-model:value="frmModel.options"
-            placeholder="please input domain"
-            style="width: 60%; margin-right: 8px"
+            v-model:value="frmModel.options[idx].name"
+            placeholder="请输入选项名称"
+            style="width: 40%; margin-right: 8px"
+          />
+          <a-input
+            v-model:value="frmModel.options[idx].notes"
+            placeholder="请输入选项备注"
+            style="width: 40%; margin-right: 8px"
           />
           <MinusCircleOutlined
             v-if="frmModel.options.length > 1"
             class="dynamic-delete-button"
             :disabled="frmModel.options.length === 1"
-            @click="removeDomain(domain)"
+            @click="onRemoveItem(idx)"
           />
         </a-form-item>
-        <a-form-item label=" ">
-          <a-button type="dashed" style="width: 60%" @click="addDomain">
+        <a-form-item
+          v-bind="{
+            wrapperCol: {
+              xs: { span: 24, offset: 0 },
+              sm: { span: 20, offset: 4 }
+            }
+          }"
+        >
+          <a-button type="dashed" style="width: 60%" @click="onAddItem">
             <PlusOutlined />
-            Add field
+            新增选项
           </a-button>
+        </a-form-item>
+        <a-form-item v-bind="formItemLayoutWithOutLabel">
+          <a-button type="primary" html-type="submit" @click="submitForm"
+            >Submit</a-button
+          >
         </a-form-item>
       </a-form>
     </a-col>
@@ -81,7 +108,8 @@ export default defineComponent({
     /*** 接口============================================== end */
     // 定义变量名称
     const state = reactive({
-      dsTreeData: []
+      dsTreeData: [],
+      demoData: null
     });
     //获取父级选项
     catalogApi.getTreeSelects().then(res => {
@@ -97,7 +125,7 @@ export default defineComponent({
       catalogId: "", // 用分类ID
       name: "", // 属性名称
       idx: 0, // 排序
-      options: []
+      options: [{ name: "", notes: "" }]
     });
 
     // 表单验证
@@ -139,9 +167,12 @@ export default defineComponent({
       try {
         let data = await validate();
         // console.log(toRaw(frmModel));
+        state.demoData = data;
         console.log(data);
         let result = await attributeApi.saveData(toRaw(frmModel));
-        return handleHttpResut(result);
+        let f = handleHttpResut(result);
+        console.log(f);
+        return false;
       } catch (err) {
         console.error("error", err);
         return false;
@@ -163,6 +194,41 @@ export default defineComponent({
       });
     };
 
+    const submitForm = async () => {
+      // validate()
+      //   .then(() => {
+      //     console.log("values", frmModel.options);
+      //   })
+      //   .catch(error => {
+      //     console.log("error", error);
+      //   });
+      try {
+        let data = await validate();
+        alert(JSON.stringify(data));
+      } catch (err) {
+        alert(err);
+      }
+    };
+    //
+    const onAddItem = () => {
+      frmModel.options.push({ name: "", notes: "" });
+    };
+    const onRemoveItem = index => {
+      //let index = dynamicValidateForm.domains.indexOf(item);
+      if (index !== -1) {
+        frmModel.options.splice(index, 1);
+      }
+    };
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 4 }
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 20 }
+      }
+    };
     // 加载初始化数据
     onMounted(() => {
       if (interData.value == undefined) {
@@ -177,7 +243,11 @@ export default defineComponent({
       ...toRefs(state),
       limitNumber,
       frmModel,
-      validateInfos
+      validateInfos,
+      onAddItem,
+      onRemoveItem,
+      formItemLayout,
+      submitForm
     };
   }
 });
