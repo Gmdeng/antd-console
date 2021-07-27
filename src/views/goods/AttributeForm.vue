@@ -5,6 +5,7 @@
       <a-form
         :model="frmModel"
         :label-col="{ span: 4 }"
+        :wrapper-col="{ span: 14 }"
         :scrollToFirstError="true"
       >
         <a-form-item label="商品分类" v-bind="validateInfos.catalogId">
