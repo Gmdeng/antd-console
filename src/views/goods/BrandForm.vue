@@ -6,51 +6,38 @@
         :wrapper-col="{ span: 14 }"
         :scrollToFirstError="true"
       >
-        <a-form-item label="用户名" v-bind="validateInfos.userId">
-          <a-input v-model:value="frmModel.userId" placeholder="请输入用户名" />
+        <a-form-item label="中文名称" v-bind="validateInfos.cnName">
+          <a-input
+            v-model:value="frmModel.cnName"
+            placeholder="请输入中文名称"
+          />
         </a-form-item>
-        <a-form-item label="昵称" v-bind="validateInfos.petName">
-          <a-input v-model:value="frmModel.petName" placeholder="请输入昵称" />
+        <a-form-item label="英文名称" v-bind="validateInfos.enName">
+          <a-input
+            v-model:value="frmModel.enName"
+            placeholder="请输入英文名称"
+          />
         </a-form-item>
-        <a-form-item label="手机号" v-bind="validateInfos.mobile">
-          <a-input v-model:value="frmModel.mobile" placeholder="请输入手机号" />
+        <a-form-item label="LOGO图标" v-bind="validateInfos.logo">
+          <a-input v-model:value="frmModel.logo" placeholder="请输入LOGO图标" />
         </a-form-item>
-        <a-form-item label="邮箱" v-bind="validateInfos.email">
-          <a-input v-model:value="frmModel.email" placeholder="请输入邮箱" />
+        <a-form-item label="网站" v-bind="validateInfos.website">
+          <a-input v-model:value="frmModel.website" placeholder="请输入网站" />
         </a-form-item>
-        <a-form-item label="角色" v-bind="validateInfos.roles">
-          <a-select
-            mode="multiple"
-            placeholder="请选择角色"
-            v-model:value="frmModel.roles"
-          >
-            <a-select-option v-for="it in roleList" :key="it.id">
-              {{ it.name }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item label="允许登录IP" v-bind="validateInfos.allowIpaddr">
+
+        <a-form-item label="品牌故事" v-bind="validateInfos.stroy">
           <a-textarea
-            v-model:value="frmModel.allowIpaddr"
-            placeholder="允许登录IP, 优先于拒绝"
+            v-model:value="frmModel.stroy"
+            placeholder="请输入品牌故事"
             :auto-size="{ minRows: 2, maxRows: 5 }"
             showCount
             :maxlength="100"
           />
         </a-form-item>
-        <a-form-item label="拒绝登录IP" v-bind="validateInfos.denyIpaddr">
+        <a-form-item label="简介" v-bind="validateInfos.summary">
           <a-textarea
-            v-model:value="frmModel.denyIpaddr"
-            placeholder="拒绝登录IP"
-            :auto-size="{ minRows: 2, maxRows: 5 }"
-            showCount
-            :maxlength="100"
-          />
-        </a-form-item>
-        <a-form-item label="备注" v-bind="validateInfos.remarks">
-          <a-textarea
-            v-model:value="frmModel.remarks"
-            placeholder="备注说明"
+            v-model:value="frmModel.summary"
+            placeholder="简介"
             :auto-size="{ minRows: 2, maxRows: 5 }"
             showCount
             :maxlength="100"
@@ -97,23 +84,22 @@ export default defineComponent({
 
     // 表单验证
     const rulesRef = reactive({
-      userId: [
+      cnName: [
         {
           required: true,
-          message: "请输入用户名"
+          message: "请输入中文名称"
         }
       ],
-      petName: [
+      enName: [
         {
           required: true,
-          message: "请输入昵称"
+          message: "请输入英文名称"
         }
       ],
-      roles: [
+      logo: [
         {
-          type: "array",
           required: true,
-          message: "请选择角色"
+          message: "请输入LOGO图标"
         }
       ]
     });

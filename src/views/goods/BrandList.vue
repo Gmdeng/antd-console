@@ -3,8 +3,8 @@
     <a-page-header
       class="demo-page-header"
       style="border: 1px solid rgb(235, 237, 240)"
-      title="用户管理"
-      sub-title="User Management "
+      title="品牌管理"
+      sub-title="Brand Management "
     >
       <template #extra>
         <a-button key="3" @click="handleEditEvent('ADD')"
@@ -13,13 +13,13 @@
       </template>
     </a-page-header>
   </div>
-  {{ searchData }}
   <!-- 头部内容end -->
   <div class="gm-container">
     <d-filter-bar
       v-model:value="searchData"
       :options="searchOptions"
-      placeholder="请输入客户名 / 客户手机号等查询"
+      @onSearch="refreshPage"
+      placeholder="请输入中文名称 / 英文名称查询"
     ></d-filter-bar>
     <a-spin :spinning="loading" style="width: 100%">
       <a-table
@@ -59,16 +59,9 @@
             </span>
           </template>
         </a-table-column>
-        <a-table-column key="userId" title="用户名" data-index="userId" />
-        <a-table-column key="petName" title="昵称" data-index="petName" />
-        <a-table-column key="mobile" title="手机号" data-index="mobile" />
-        <a-table-column key="email" title="邮箱" data-index="email" />
-        <a-table-column key="status" title="状态" data-index="status" />
-        <a-table-column key="create" title="创建时间/人">
-          <template #default="{ record }">
-            {{ record.createOn }}/{{ record.createBy }}
-          </template>
-        </a-table-column>
+        <a-table-column key="cnName" title="中文名称" data-index="cnName" />
+        <a-table-column key="enName" title="英文名称" data-index="enName" />
+        <a-table-column key="logo" title="LOGO图标" data-index="logo" />
       </a-table>
     </a-spin>
   </div>
@@ -115,56 +108,6 @@ export default {
       searchData: {}, // 搜索
       searchOptions: [
         // 搜索条件结构
-        {
-          label: "结算方式",
-          dataIndex: "payType",
-          defaultValue: [],
-          type: "checkbox",
-          options: [
-            { label: "现金结算", value: "1" },
-            { label: "微信结算", value: "2" },
-            { label: "支付宝结算", value: "3" },
-            { label: "银行卡结算", value: "4" },
-            { label: "储值卡结算", value: "5" }
-          ]
-        },
-        {
-          label: "开单时间",
-          dataIndex: "startTime",
-          defaultValue: "",
-          type: "radio",
-          options: [
-            { label: "今日", value: "1" },
-            { label: "本周", value: "2" },
-            { label: "本月", value: "3" },
-            { label: "上月", value: "4" },
-            { label: "本年", value: "5" }
-          ]
-        },
-        {
-          label: "正常时间",
-          dataIndex: "noneTime",
-          defaultValue: "",
-          type: "date-picker"
-        },
-        {
-          label: "自定义时间",
-          dataIndex: "endTime",
-          defaultValue: [],
-          type: "date-range-picker"
-        },
-        {
-          label: "电子邮件",
-          dataIndex: "email",
-          defaultValue: "",
-          type: "input"
-        },
-        {
-          label: "手机号",
-          dataIndex: "mobile",
-          defaultValue: "",
-          type: "input"
-        }
       ]
     });
 
@@ -212,8 +155,10 @@ export default {
     const loadData = () => {
       state.loading = true;
       let param = {
-        pageSize: state.pagination.pageSize,
-        current: state.pagination.current
+        pager: {
+          pageSize: state.pagination.pageSize,
+          indexPage: state.pagination.current
+        }
       };
       Object.assign(param, state.searchData);
       //
@@ -234,6 +179,7 @@ export default {
     };
     // 刷新页面
     const refreshPage = () => {
+      state.pagination.current = 1;
       loadData();
     };
     // 加载事件

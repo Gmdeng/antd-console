@@ -54,8 +54,8 @@
           <MinusCircleOutlined
             v-if="frmModel.options.length > 1"
             class="dynamic-delete-button"
-            :disabled="frmModel.options.length === 1"
-            @click="onRemoveItem(idx)"
+            :disabled="false"
+            @click.prevent="onRemoveItem(idx)"
           />
         </a-form-item>
         <a-form-item
