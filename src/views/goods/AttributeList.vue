@@ -150,9 +150,11 @@ export default {
     const loadData = () => {
       state.loading = true;
       let param = {
-        pageSize: state.pagination.pageSize,
-        current: state.pagination.current
-      };
+        pager: {
+          pageSize: state.pagination.pageSize,
+          indexPage: state.pagination.current
+        }
+      };  
       Object.assign(param, state.searchData);
       //
       attributeApi
