@@ -1,7 +1,7 @@
 <template>
   {{ demoData }}
   <a-row :gutter="24">
-    <a-col :sm="24" :md="12" :xl="12">
+    <a-col :sm="24" :md="24" :xl="24">
       <a-form
         :model="frmModel"
         :label-col="{ span: 4 }"
@@ -19,7 +19,11 @@
           </a-tree-select>
         </a-form-item>
         <a-form-item label="属性名称" v-bind="validateInfos.name">
-          <a-input v-model:value="frmModel.name" placeholder="请输入属性名称" />
+          <a-input
+            v-model:value="frmModel.name"
+            placeholder="请输入属性名称"
+            allow-clear
+          />
         </a-form-item>
         <a-form-item label="排序" v-bind="validateInfos.idx">
           <a-input-number
@@ -45,16 +49,17 @@
             v-model:value="frmModel.options[idx].name"
             placeholder="请输入选项名称"
             style="width: 40%; margin-right: 8px"
+            allow-clear
           />
           <a-input
             v-model:value="frmModel.options[idx].notes"
             placeholder="请输入选项备注"
             style="width: 40%; margin-right: 8px"
+            allow-clear
           />
           <MinusCircleOutlined
             v-if="frmModel.options.length > 1"
             class="dynamic-delete-button"
-            :disabled="false"
             @click.prevent="onRemoveItem(idx)"
           />
         </a-form-item>
@@ -196,6 +201,7 @@ export default defineComponent({
     };
 
     const submitForm = async () => {
+      Promise.resolve("test");
       // validate()
       //   .then(() => {
       //     console.log("values", frmModel.options);

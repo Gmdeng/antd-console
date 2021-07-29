@@ -63,6 +63,11 @@
           title="所属分类"
           data-index="catalogId"
         />
+        <a-table-colum
+          key="catalogName"
+          title="所属分类"
+          data-index="catalogName"
+        />
         <a-table-column key="name" title="属性名称" data-index="name" />
         <a-table-column key="idx" title="排序" data-index="idx" />
         <a-table-column key="values" title="属性值项" data-index="values" />
@@ -154,7 +159,7 @@ export default {
           pageSize: state.pagination.pageSize,
           indexPage: state.pagination.current
         }
-      };  
+      };
       Object.assign(param, state.searchData);
       //
       attributeApi
