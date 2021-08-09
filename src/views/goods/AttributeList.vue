@@ -58,11 +58,6 @@
             </span>
           </template>
         </a-table-column>
-        <a-table-column
-          key="catalogId"
-          title="所属分类"
-          data-index="catalogId"
-        />
         <a-table-colum
           key="catalogName"
           title="所属分类"

@@ -1,85 +1,131 @@
 <template>
-  <a-form :model="frmModel" v-bind="formItemLayoutWithOutLabel">
-    <a-form-item
-      v-for="(option, index) in frmModel.options"
-      :key="option.key"
-      v-bind="index === 0 ? formItemLayout : {}"
-      :label="index === 0 ? 'Domains' : ''"
-      :name="['options', index, 'value']"
-      :rules="{
-        required: true,
-        message: 'domain can not be null',
-        trigger: 'change'
-      }"
-    >
-      <a-input
-        v-model:value="option.value"
-        placeholder="please input domain"
-        style="width: 40%; margin-right: 8px"
-      />
-      <a-input
-        v-model:value="option.key"
-        placeholder="please input domain"
-        style="width: 40%; margin-right: 8px"
-      />
-      <MinusCircleOutlined
-        v-if="frmModel.options.length > 1"
-        class="dynamic-delete-button"
-        :disabled="frmModel.options.length === 1"
-        @click="removeDomain(option)"
-      />
-    </a-form-item>
-    <a-form-item v-bind="formItemLayoutWithOutLabel">
-      <a-button type="dashed" style="width: 60%" @click="addDomain">
-        <PlusOutlined />
-        Add field
-      </a-button>
-    </a-form-item>
-    <a-form-item v-bind="formItemLayoutWithOutLabel">
-      <a-button type="primary" html-type="submit" @click="submitForm"
-        >Submit</a-button
+  <a-row :gutter="24">
+    <a-col :sm="24" :md="24" :xl="24">
+      <a-form
+        :model="frmModel"
+        :label-col="{ span: 4 }"
+        :wrapper-col="{ span: 14 }"
       >
-      <a-button style="margin-left: 10px" @click="resetForm">Reset</a-button>
-    </a-form-item>
-  </a-form>
+        <a-form-item label="商品分类" v-bind="validateInfos.catalogId">
+          <a-tree-select
+            v-model:value="frmModel.catalogId"
+            size="large"
+            :tree-data="dsTreeData"
+            placeholder="请选择商品分类"
+            tree-default-expand-all
+          >
+          </a-tree-select>
+        </a-form-item>
+        <a-form-item label="属性名称" v-bind="validateInfos.name">
+          <a-input
+            v-model:value="frmModel.name"
+            placeholder="请输入属性名称"
+            allow-clear
+          />
+        </a-form-item>
+        <a-form-item label="排序" v-bind="validateInfos.idx">
+          <a-input-number
+            v-model:value="frmModel.idx"
+            :precision="0"
+            :formatter="limitNumber"
+            :parser="limitNumber"
+            :min="0"
+            placeholder="请输入排序"
+          />
+        </a-form-item>
+        <a-form-item
+          v-for="(option, index) in frmModel.options"
+          :key="index"
+          :label="index === 0 ? '选项' : ''"
+          :name="['options', index, 'name']"
+          :rules="{
+            required: true,
+            message: '选项名称不能为空',
+            trigger: 'change'
+          }"
+          :wrapperCol="{
+            xs: { span: 24, offset: 0 },
+            sm: { span: 20, offset: 4 }
+          }"
+        >
+          <a-input
+            v-model:value="option.name"
+            placeholder="请输入选项名称"
+            style="width: 40%; margin-right: 8px"
+          />
+          <a-input
+            v-model:value="option.notes"
+            placeholder="请输入选项备注"
+            style="width: 40%; margin-right: 8px"
+          />
+          <MinusCircleOutlined
+            v-if="frmModel.options.length > 1"
+            class="dynamic-delete-button"
+            @click="removeOption(option)"
+          />
+        </a-form-item>
+        <a-form-item
+          :wrapperCol="{
+            xs: { span: 24, offset: 0 },
+            sm: { span: 20, offset: 4 }
+          }"
+        >
+          <a-button type="dashed" style="width: 60%" @click="addOption">
+            <PlusOutlined />
+            Add Option 新增选项
+          </a-button>
+        </a-form-item>
+        <a-form-item v-bind="formItemLayoutWithOutLabel">
+          <a-button type="primary" html-type="submit" @click="submitForm"
+            >Submit</a-button
+          >
+          <a-button style="margin-left: 10px" @click="resetForm"
+            >Reset</a-button
+          >
+        </a-form-item>
+      </a-form>
+    </a-col>
+  </a-row>
 </template>
 <script>
+import {
+  defineComponent,
+  reactive,
+  inject,
+  onMounted,
+  toRaw,
+  toRefs
+} from "vue";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons-vue";
-import { defineComponent, reactive, inject } from "vue";
+import attributeApi from "@/api/attributeApi";
+import catalogApi from "@/api/catalogApi";
 import { useForm } from "@ant-design-vue/use";
+import { limitNumber } from "@/library/utils/Functions";
 export default defineComponent({
+  components: {
+    MinusCircleOutlined,
+    PlusOutlined
+  },
   setup() {
+    /*** 上层接口==============================================*/
+    const interEvtSubmit = inject("interEvtSubmit");
+    const interEvtReset = inject("interEvtReset");
+    const interData = inject("interData");
     const interEvtCloseLoad = inject("interEvtCloseLoad");
-    const formItemLayout = {
-      labelCol: {
-        xs: {
-          span: 24
-        },
-        sm: {
-          span: 4
-        }
-      },
-      wrapperCol: {
-        xs: {
-          span: 24
-        },
-        sm: {
-          span: 20
-        }
+    /*** 接口============================================== end */
+    // 定义变量名称
+    const state = reactive({
+      dsTreeData: [],
+      demoData: null
+    });
+    //获取父级选项
+    catalogApi.getTreeSelects().then(res => {
+      if (res.code == 0) {
+        state.dsTreeData = [];
+        state.dsTreeData.push(res.data);
+        //alert(JSON.stringify(res.data));
       }
-    };
-    const formItemLayoutWithOutLabel = {
-      wrapperCol: {
-        xs: {
-          span: 24,
-          offset: 0
-        },
-        sm: {
-          span: 20,
-          offset: 4
-        }
-      }
-    };
+    });
     const frmModel = reactive({
       id: "", // ID
       catalogId: "", // 用分类ID
@@ -89,12 +135,23 @@ export default defineComponent({
     });
 
     // 表单验证
-    const rulesRef = reactive({});
-    const { resetFields, validate } = useForm(frmModel, rulesRef);
+    const rulesRef = reactive({
+      name: [
+        {
+          required: true,
+          message: "请输入属性名称"
+        }
+      ]
+    });
+    const { resetFields, validate, validateInfos } = useForm(
+      frmModel,
+      rulesRef
+    );
     const submitForm = () => {
       validate()
         .then(() => {
-          console.log("values", frmModel.domains);
+          alert("successfuly able");
+          console.log("values", frmModel.options);
         })
         .catch(error => {
           console.log("error", error);
@@ -105,7 +162,7 @@ export default defineComponent({
       resetFields();
     };
 
-    const removeDomain = item => {
+    const removeOption = item => {
       let index = frmModel.options.indexOf(item);
 
       if (index !== -1) {
@@ -113,27 +170,57 @@ export default defineComponent({
       }
     };
 
-    const addDomain = () => {
+    const addOption = () => {
       frmModel.options.push({
-        value: "",
-        key: Date.now()
+        name: "",
+        notes: Date.now()
       });
     };
-    interEvtCloseLoad();
+    // 初始化表单
+    const initFormData = () => {
+      attributeApi.getFormData(frmModel.id).then(res => {
+        if (res.code == 0) {
+          Object.assign(frmModel, res.data);
+          if (frmModel.options == null)
+            frmModel.options = [{ name: "", notes: "" }];
+          interEvtCloseLoad();
+        }
+      });
+    };
+
+    // 调用上级接口
+    interEvtSubmit(() => {
+      return validate().then(data => {
+        state.demoData = data;
+        return attributeApi.saveData(toRaw(frmModel));
+      });
+    });
+
+    // 重置表单事件
+    interEvtReset(async () => {
+      resetFields();
+    });
+
+    // 加载初始化数据
+    onMounted(() => {
+      if (interData.value == undefined) {
+        frmModel.id = null;
+        interEvtCloseLoad();
+      } else {
+        frmModel.id = interData.value;
+        initFormData();
+      }
+    });
     return {
-      formItemLayout,
-      formItemLayoutWithOutLabel,
+      ...toRefs(state),
+      limitNumber,
+      validateInfos,
       frmModel,
       submitForm,
       resetForm,
-      removeDomain,
-      addDomain
+      removeOption,
+      addOption
     };
-  },
-
-  components: {
-    MinusCircleOutlined,
-    PlusOutlined
   }
 });
 </script>

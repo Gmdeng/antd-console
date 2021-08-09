@@ -15,7 +15,7 @@
     <div class="footer" v-if="footerVisible">
       <a-button
         type="primary"
-        @click="onSubmitHandle"
+        @click="onSubmitHandle2"
         :loading="state.submitLoading"
         :disabled="state.spinning"
       >
@@ -75,7 +75,7 @@ export default defineComponent({
       visible: false, //是否显示
       submitLoading: false, //提交状态
       data: undefined, // 数据
-      onSubmitEvent: async e => {
+      onSubmitEvent: e => {
         // 定义提交事件
         e.preventDefault();
       },
@@ -136,8 +136,6 @@ export default defineComponent({
           // 刷新parent组件
           props.refreshParent();
           state.visible = false;
-        } else {
-          // alert(978);
         }
         //context.emit("testRefresh", "Ricky", "G-M");
       } catch (error) {
@@ -149,6 +147,25 @@ export default defineComponent({
       }
       state.submitLoading = false;
     };
+    // 提交事件
+    const onSubmitHandle2 = evt => {
+      state.submitLoading = true;
+      evt.preventDefault();
+      state
+        .onSubmitEvent()
+        .then(() => {
+          // 刷新parent组件
+          props.refreshParent();
+          state.visible = false;
+        })
+        .catch(err => {
+          ctx.$message.error(JSON.stringify(err));
+        })
+        .finally(() => {
+          state.submitLoading = false;
+        });
+      // state.submitLoading = false;
+    };
     const onResetHandle = async evt => {
       evt.preventDefault();
       state.onResetEvent();
@@ -159,6 +176,7 @@ export default defineComponent({
       Open,
       onClose,
       onSubmitHandle,
+      onSubmitHandle2,
       onResetHandle
     };
   }

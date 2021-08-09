@@ -50,9 +50,14 @@ const routes = [
     component: () => import("@/views/goods/CatalogList.vue")
   },
   {
-    path: "/goodsList",
-    name: "GoodsList",
-    component: () => import("@/views/goods/GoodsList.vue")
+    path: "/goodsSpuList",
+    name: "GoodsSpuList",
+    component: () => import("@/views/goods/GoodsSpuList.vue")
+  },
+  {
+    path: "/goodsSkuList",
+    name: "GoodsSkuList",
+    component: () => import("@/views/goods/GoodsSkuList.vue")
   },
   {
     path: "/articleList",

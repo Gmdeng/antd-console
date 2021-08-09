@@ -173,7 +173,7 @@ export function handleHttpResut(ret) {
       message: "数据提交成功",
       description: "正在为您更新当前页面数据."
     });
-    return true;
+    return Promise.reject("数据异常");
   }
 
   //let errMsg = "";
@@ -190,7 +190,7 @@ export function handleHttpResut(ret) {
     message: "数据异常",
     description: h("p", { style: "color: red" }, arrErr)
   });
-  return false;
+  return Promise.reject("数据异常");
 }
 
 /**

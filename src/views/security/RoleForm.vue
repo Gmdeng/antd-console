@@ -198,12 +198,10 @@ export default defineComponent({
       let selectedNodes = FindTreeNode(state.menuList, id);
       handleCheckedChildren(selectedNodes, state.checkAlls[id]);
     };
-    // 调用上级接口
-    interEvtSubmit(async () => {
-      try {
-        let data = await validate();
-        // console.log(toRaw(frmModel));
-        console.log(data);
+    // 调用上级接口--提交表单
+    interEvtSubmit(() => {
+      return validate().then(data => {
+        //state.demoData = data;
         // alert(JSON.stringify(frmModel.permissions));
         frmModel.privileges = [];
         for (var key in state.permissions) {
@@ -221,16 +219,46 @@ export default defineComponent({
             message: "至少选中一项",
             description: "模块权限至少选中一项."
           });
-          return false;
+          return Promise.reject("至少选中一项");
         }
-        // frmModel.privileges = permissions;
-        let result = await roleApi.saveData(toRaw(frmModel));
-        return handleHttpResut(result);
-      } catch (err) {
-        console.error("error", err);
-        return false;
-      }
+        console.info("提交数据：", data);
+        return roleApi.saveData(toRaw(frmModel)).then(ret => {
+          return handleHttpResut(ret);
+        });
+      });
     });
+    // interEvtSubmit(async () => {
+    //   try {
+    //     let data = await validate();
+    //     // console.log(toRaw(frmModel));
+    //     console.log(data);
+    //     // alert(JSON.stringify(frmModel.permissions));
+    //     frmModel.privileges = [];
+    //     for (var key in state.permissions) {
+    //       // alert(key + "长度==" + frmModel.permissions[key].length);
+    //       if (state.permissions[key].length > 0) {
+    //         frmModel.privileges.push({
+    //           moduleId: key,
+    //           values: state.permissions[key]
+    //         });
+    //       }
+    //     }
+    //     // 判断选中的模块权限
+    //     if (frmModel.privileges.length == 0) {
+    //       notification["error"]({
+    //         message: "至少选中一项",
+    //         description: "模块权限至少选中一项."
+    //       });
+    //       return false;
+    //     }
+    //     // frmModel.privileges = permissions;
+    //     let result = await roleApi.saveData(toRaw(frmModel));
+    //     return handleHttpResut(result);
+    //   } catch (err) {
+    //     console.error("error", err);
+    //     return false;
+    //   }
+    // });
 
     // 重置表单事件
     interEvtReset(async () => {

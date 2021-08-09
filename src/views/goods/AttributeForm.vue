@@ -1,12 +1,10 @@
 <template>
-  {{ demoData }}
   <a-row :gutter="24">
     <a-col :sm="24" :md="24" :xl="24">
       <a-form
         :model="frmModel"
         :label-col="{ span: 4 }"
         :wrapper-col="{ span: 14 }"
-        :scrollToFirstError="true"
       >
         <a-form-item label="商品分类" v-bind="validateInfos.catalogId">
           <a-tree-select
@@ -36,50 +34,46 @@
           />
         </a-form-item>
         <a-form-item
-          v-for="(it, idx) in frmModel.options"
-          :key="idx"
-          :label="idx === 0 ? '选项值' : ' '"
-          :name="['options', idx, 'name']"
+          v-for="(option, index) in frmModel.options"
+          :key="index"
+          :label="index === 0 ? '选项' : ''"
+          :name="['options', index, 'name']"
           :rules="{
             required: true,
-            message: '选项值不能为空'
+            message: '选项名称不能为空',
+            trigger: 'change'
+          }"
+          :wrapperCol="{
+            xs: { span: 24, offset: 0 },
+            sm: { span: 20, offset: 4 }
           }"
         >
           <a-input
-            v-model:value="frmModel.options[idx].name"
+            v-model:value="option.name"
             placeholder="请输入选项名称"
             style="width: 40%; margin-right: 8px"
-            allow-clear
           />
           <a-input
-            v-model:value="frmModel.options[idx].notes"
+            v-model:value="option.notes"
             placeholder="请输入选项备注"
             style="width: 40%; margin-right: 8px"
-            allow-clear
           />
           <MinusCircleOutlined
             v-if="frmModel.options.length > 1"
             class="dynamic-delete-button"
-            @click.prevent="onRemoveItem(idx)"
+            @click="removeOption(option)"
           />
         </a-form-item>
         <a-form-item
-          v-bind="{
-            wrapperCol: {
-              xs: { span: 24, offset: 0 },
-              sm: { span: 20, offset: 4 }
-            }
+          :wrapperCol="{
+            xs: { span: 24, offset: 0 },
+            sm: { span: 20, offset: 4 }
           }"
         >
-          <a-button type="dashed" style="width: 60%" @click="onAddItem">
+          <a-button type="dashed" style="width: 60%" @click="addOption">
             <PlusOutlined />
-            新增选项
+            Add Option 新增选项
           </a-button>
-        </a-form-item>
-        <a-form-item v-bind="formItemLayoutWithOutLabel">
-          <a-button type="primary" html-type="submit" @click="submitForm"
-            >Submit</a-button
-          >
         </a-form-item>
       </a-form>
     </a-col>
@@ -100,7 +94,6 @@ import catalogApi from "@/api/catalogApi";
 import { useForm } from "@ant-design-vue/use";
 import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
 export default defineComponent({
-  name: "UserForm",
   components: {
     MinusCircleOutlined,
     PlusOutlined
@@ -114,18 +107,16 @@ export default defineComponent({
     /*** 接口============================================== end */
     // 定义变量名称
     const state = reactive({
-      dsTreeData: [],
-      demoData: null
+      dsTreeData: []
     });
     //获取父级选项
     catalogApi.getTreeSelects().then(res => {
       if (res.code == 0) {
         state.dsTreeData = [];
         state.dsTreeData.push(res.data);
-        //alert(JSON.stringify(res.data));
       }
     });
-    // 表单绑定数据
+    // 表单结构模型
     const frmModel = reactive({
       id: "", // ID
       catalogId: "", // 用分类ID
@@ -136,53 +127,58 @@ export default defineComponent({
 
     // 表单验证
     const rulesRef = reactive({
-      catalogId: [
-        {
-          required: true,
-          message: "请选择分类"
-        }
-      ],
       name: [
         {
           required: true,
           message: "请输入属性名称"
         }
       ],
-      idx: [
+      catalogId: [
         {
           required: true,
-          message: "请输入排序"
-        }
-      ],
-      options: [
-        {
-          type: "array",
-          required: true,
-          message: "请选择增加选项值"
+          message: "请选择分类"
         }
       ]
     });
-
     const { resetFields, validate, validateInfos } = useForm(
       frmModel,
       rulesRef
     );
 
-    // 调用上级接口
-    interEvtSubmit(async () => {
-      try {
-        let data = await validate();
-        // console.log(toRaw(frmModel));
-        state.demoData = data;
-        console.log(data);
-        let result = await attributeApi.saveData(toRaw(frmModel));
-        let f = handleHttpResut(result);
-        console.log(f);
-        return false;
-      } catch (err) {
-        console.error("error", err);
-        return false;
+    const removeOption = item => {
+      let index = frmModel.options.indexOf(item);
+      if (index !== -1) {
+        frmModel.options.splice(index, 1);
       }
+    };
+
+    const addOption = () => {
+      frmModel.options.push({
+        name: "",
+        notes: ""
+      });
+    };
+    // 初始化表单
+    const initFormData = () => {
+      attributeApi.getFormData(frmModel.id).then(res => {
+        if (res.code == 0) {
+          Object.assign(frmModel, res.data);
+          if (frmModel.options == null)
+            frmModel.options = [{ name: "", notes: "" }];
+          interEvtCloseLoad();
+        }
+      });
+    };
+
+    // 调用上级接口--提交表单
+    interEvtSubmit(() => {
+      return validate().then(data => {
+        //state.demoData = data;
+        console.info("提交数据：", data);
+        return attributeApi.saveData(toRaw(frmModel)).then(ret => {
+          return handleHttpResut(ret);
+        });
+      });
     });
 
     // 重置表单事件
@@ -190,52 +186,6 @@ export default defineComponent({
       resetFields();
     });
 
-    // 初始化表单
-    const initFormData = () => {
-      attributeApi.getFormData(frmModel.id).then(res => {
-        if (res.code == 0) {
-          Object.assign(frmModel, res.data);
-          interEvtCloseLoad();
-        }
-      });
-    };
-
-    const submitForm = async () => {
-      Promise.resolve("test");
-      // validate()
-      //   .then(() => {
-      //     console.log("values", frmModel.options);
-      //   })
-      //   .catch(error => {
-      //     console.log("error", error);
-      //   });
-      try {
-        let data = await validate();
-        alert(JSON.stringify(data));
-      } catch (err) {
-        alert(err);
-      }
-    };
-    //
-    const onAddItem = () => {
-      frmModel.options.push({ name: "", notes: "" });
-    };
-    const onRemoveItem = index => {
-      //let index = dynamicValidateForm.domains.indexOf(item);
-      if (index !== -1) {
-        frmModel.options.splice(index, 1);
-      }
-    };
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 4 }
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 20 }
-      }
-    };
     // 加载初始化数据
     onMounted(() => {
       if (interData.value == undefined) {
@@ -249,13 +199,28 @@ export default defineComponent({
     return {
       ...toRefs(state),
       limitNumber,
-      frmModel,
       validateInfos,
-      onAddItem,
-      onRemoveItem,
-      formItemLayout,
-      submitForm
+      frmModel,
+      removeOption,
+      addOption
     };
   }
 });
 </script>
+<style>
+.dynamic-delete-button {
+  cursor: pointer;
+  position: relative;
+  top: 4px;
+  font-size: 24px;
+  color: #999;
+  transition: all 0.3s;
+}
+.dynamic-delete-button:hover {
+  color: #777;
+}
+.dynamic-delete-button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+</style>

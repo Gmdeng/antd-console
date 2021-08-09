@@ -174,18 +174,15 @@ export default defineComponent({
       rulesRef
     );
 
-    // 调用上级接口
-    interEvtSubmit(async () => {
-      try {
-        let data = await validate();
-        // console.log(toRaw(frmModel));
-        console.log(data);
-        let result = await catalogApi.saveData(toRaw(frmModel));
-        return handleHttpResut(result);
-      } catch (err) {
-        console.error("error", err);
-        return false;
-      }
+    // 调用上级接口--提交表单
+    interEvtSubmit(() => {
+      return validate().then(data => {
+        //state.demoData = data;
+        console.info("提交数据：", data);
+        return catalogApi.saveData(toRaw(frmModel)).then(ret => {
+          return handleHttpResut(ret);
+        });
+      });
     });
     // 重置表单事件
     interEvtReset(async () => {

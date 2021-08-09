@@ -29,7 +29,7 @@ export async function IDValidator(rule, value) {
 }
 
 // 自定义校验函数，要求输入的是一个正整数
-export async function PositiveInteger(rule, value) {
+export async function PositiveIntegerValidator(rule, value) {
   const number = Number(value);
   if (!Number.isInteger(number) || number < 0) {
     // 如果需要返回 error msg，就把它传给 `callback()`
@@ -76,18 +76,18 @@ export async function QuantityValidator(rule, value) {
 // 金额
 export async function AmountValidator(rule, value) {
   if (!value) {
-    return Promise.reject("请输入提现金额");
+    return Promise.reject("请输入金额");
   } else if (!value.trim().length) {
-    return Promise.reject("请输入提现金额");
+    return Promise.reject("请输入金额");
   } else if (isNaN(value)) {
-    return Promise.reject("请输入正确的提现金额");
-  } else if (Number(value) > Number(this.avalibleAmount)) {
-    return Promise.reject("提现金额已超出可用金额");
+    return Promise.reject("请输入正确的金额");
+    // } else if (Number(value) > Number(this.avalibleAmount)) {
+    //   return Promise.reject("提现金额已超出可用金额");
   } else if (
     value.indexOf(".") > -1 &&
     value.toString().split(".")[1].length > 2
   ) {
-    return Promise.reject("请输入正确的提现金额，小数点后保留两位数字");
+    return Promise.reject("请输入正确金额，小数点后保留两位数字");
   }
   return Promise.resolve();
 }
