@@ -2,7 +2,7 @@ import Axios from "@/library/Axios";
 /**
  * 用户相关接口
  */
-const BASE_URL = "/admin/goods/goodsSpu";
+const BASE_URL = "/admin/goods/sku";
 export default {
   /**
    * 分页获取数据列表

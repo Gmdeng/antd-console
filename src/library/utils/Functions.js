@@ -173,7 +173,7 @@ export function handleHttpResut(ret) {
       message: "数据提交成功",
       description: "正在为您更新当前页面数据."
     });
-    return Promise.reject("数据异常");
+    return Promise.resolve("操作成功");
   }
 
   //let errMsg = "";

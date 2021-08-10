@@ -5,6 +5,13 @@ import Axios from "@/library/Axios";
 const BASE_URL = "/admin/goods/brand";
 export default {
   /**
+   * 获取品牌名数据列表
+   */
+  getBrandList(params) {
+    // console.info(JSON.stringify(params));
+    return Axios.post(`${BASE_URL}/getDataList`, params);
+  },
+  /**
    * 分页获取数据列表
    */
   getDataListByPage(params) {
