@@ -91,9 +91,7 @@ export function TreeCleanEmptyNode(treeList, children = "children") {
  */
 export function formatterMoney(val) {
   val = val.toString().replace(/\$|\\,/g, "");
-  if (isNaN(val)) {
-    val = "0";
-  }
+  if (isNaN(val)) val = "0";
   let sign = val == (val = Math.abs(val));
   val = Math.floor(val * 100 + 0.50000000001);
   let cents = val % 100;

@@ -41,6 +41,16 @@
         <a-form-item label="缩略图" v-bind="validateInfos.thumb">
           <a-input v-model:value="frmModel.thumb" placeholder="请输入缩略图" />
         </a-form-item>
+        <a-form-item label="排序" v-bind="validateInfos.idx">
+          <a-input-number
+            v-model:value="frmModel.idx"
+            :precision="0"
+            :formatter="limitNumber"
+            :parser="limitNumber"
+            :min="0"
+            placeholder="请输入排序"
+          />
+        </a-form-item>
         <a-form-item label="单位" v-bind="validateInfos.unit">
           <a-input v-model:value="frmModel.unit" placeholder="请输入单位" />
         </a-form-item>
@@ -50,23 +60,36 @@
             v-model:value="frmModel.price"
             placeholder="请输入销售价"
             :formatter="
-              value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              value => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
             "
-            :parser="value => value.replace(/\$\s?|(,*)/g, '')"
+            :parser="value => value.replace(/\￥\s?|(,*)/g, '')"
           />
         </a-form-item>
         <a-form-item label="价值" v-bind="validateInfos.pv">
-          <a-input v-model:value="frmModel.pv" placeholder="请输入价值" />
+          <a-input
+            v-model:value="frmModel.pv"
+            placeholder="请输入价值"
+            prefix="￥"
+            suffix="PV"
+          />
         </a-form-item>
         <a-form-item label="运费" v-bind="validateInfos.freight">
           <a-input-number
             style="width: 100%"
             v-model:value="frmModel.freight"
             placeholder="请输入运费"
+            :precision="2"
+            size="large"
             :formatter="
               value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
             "
             :parser="value => value.replace(/\$\s?|(,*)/g, '')"
+          />
+          <a-input-number
+            :defaultValue="20201991.11"
+            placeholder="请输入总金额"
+            :precision="2"
+            style="width: 100%;"
           />
         </a-form-item>
       </a-form>
@@ -129,7 +152,6 @@ export default defineComponent({
       idx: "", //排序 idx
       price: "", //销售价 price
       pv: "", //价值  pv
-      status: "", //销售状态 status
       averageCost: "", //商品加权平均成本 averageCost
       freight: "" //运费 freight
     });

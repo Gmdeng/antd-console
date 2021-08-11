@@ -13,7 +13,7 @@
         </template>
         <template #suffix>
           <a-button type="primary" @click="onSearchEvent" size="large">
-            Search
+            搜索
           </a-button>
         </template>
       </a-input>
