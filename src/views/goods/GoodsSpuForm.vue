@@ -80,16 +80,8 @@
             placeholder="请输入运费"
             :precision="2"
             size="large"
-            :formatter="
-              value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-            "
-            :parser="value => value.replace(/\$\s?|(,*)/g, '')"
-          />
-          <a-input-number
-            :defaultValue="20201991.11"
-            placeholder="请输入总金额"
-            :precision="2"
-            style="width: 100%;"
+            :formatter="MoneySeparator"
+            :parser="value => value.replace(/\￥\s?|(,*)/g, '')"
           />
         </a-form-item>
       </a-form>
@@ -109,7 +101,11 @@ import goodsSpuApi from "@/api/goodsSpuApi";
 import catalogApi from "@/api/catalogApi";
 import brandApi from "@/api/brandApi";
 import { useForm } from "@ant-design-vue/use";
-import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
+import {
+  limitNumber,
+  handleHttpResut,
+  MoneySeparator
+} from "@/library/utils/Functions";
 export default defineComponent({
   name: "UserForm",
   setup() {
@@ -227,6 +223,7 @@ export default defineComponent({
     return {
       ...toRefs(state),
       limitNumber,
+      MoneySeparator,
       frmModel,
       validateInfos
     };

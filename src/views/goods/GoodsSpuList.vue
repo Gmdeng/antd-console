@@ -57,9 +57,9 @@
         </a-table-column>
         <a-table-column key="thumb" title="缩略图" data-index="thumb" />
         <a-table-colum
-          key="catalogName"
+          key="catalogId"
           title="所属分类"
-          data-index="catalogName"
+          data-index="catalogId"
         />
         <a-table-column key="name" title="商品名称" data-index="name" />
         <a-table-column key="code" title="商品编码" data-index="code" />

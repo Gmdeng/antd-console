@@ -108,7 +108,30 @@ export function formatterMoney(val) {
 
   return (sign ? "" : "-") + val + "." + cents;
 }
-
+/**
+ * 金额
+ * @param {} str
+ * @returns
+ */
+export function MoneySeparator(value) {
+  return `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  // alert(str);
+  // str = str.replace(/\\￥\s?|(,*)/g, "");
+  // // console.info(str);
+  // var reg = /\d+\.{0,1}\d{1,2}/;
+  // var results = reg.exec(str);
+  // if (results == null) return "￥ 0.00";
+  // var arr = results.toString().split(".");
+  // var retNum = parseInt(arr[0], 10)
+  //   .toString()
+  //   .replace(/(?=(\d{3})+(?!\d))/g, ",");
+  // if (retNum.indexOf(",") == 0) retNum = retNum.substr(1);
+  // if (arr.length > 1) {
+  //   return "￥ " + retNum + "." + arr[1];
+  // } else {
+  //   return "￥ " + retNum + ".00";
+  // }
+}
 /**
  * 限制只能为整数字
  * @param {*} val
