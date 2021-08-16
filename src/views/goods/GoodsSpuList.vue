@@ -44,9 +44,9 @@
                   <a-menu-item @click="handleEditEvent('EDIT', record.id)"
                     >修改</a-menu-item
                   >
-                  <a-menu-item @click="handleEditEvent('DELETE', record.id)">
-                    删除
-                  </a-menu-item>
+                  <a-menu-item @click="handleEditEvent('DELETE', record.id)"
+                    >删除</a-menu-item
+                  >
                 </a-menu>
               </template>
             </a-dropdown>
@@ -57,18 +57,19 @@
         </a-table-column>
         <a-table-column key="thumb" title="缩略图" data-index="thumb" />
         <a-table-colum
-          key="catalogId"
+          key="catalogName"
           title="所属分类"
-          data-index="catalogId"
+          data-index="catalogName"
         />
         <a-table-column key="name" title="商品名称" data-index="name" />
         <a-table-column key="code" title="商品编码" data-index="code" />
-        <a-table-column key="brandName" title="品牌ID" data-index="brandName" />
+        <a-table-column key="brandName" title="品牌" data-index="brandName" />
         <a-table-column key="unit" title="单位" data-index="unit" />
         <a-table-column key="price" title="销售价" data-index="price" />
       </a-table>
     </a-spin>
   </div>
+  <!-- 组件 -->
   <d-drawer :title="formTitle" ref="refEditWrap" :refreshParent="refreshPage">
     <goods-spu-form></goods-spu-form>
   </d-drawer>

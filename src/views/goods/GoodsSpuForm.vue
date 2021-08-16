@@ -145,15 +145,19 @@ export default defineComponent({
       thumb: "", //缩略图 thumb
       unit: "", //单位 unit
       specsOwn: "", //规格参数JSON specsOwn
-      idx: "", //排序 idx
-      price: "", //销售价 price
-      pv: "", //价值  pv
+      idx: 0, //排序 idx
+      price: "0.00", //销售价 price
+      pv: 0, //价值  pv
       averageCost: "", //商品加权平均成本 averageCost
-      freight: "" //运费 freight
+      freight: "0.00" //运费 freight
     });
 
     // 表单验证
     const rulesRef = reactive({
+      catalogId: [{
+          required: true,
+          message: "请选择商品分类"
+        }],
       name: [
         {
           required: true,
