@@ -103,7 +103,15 @@
               placeholder="Autosize height with minimum and maximum number of lines"
               :auto-size="{ minRows: 2, maxRows: 5 }"
             />
+            <editor
+              v-model="formModel.dbDesc"
+              :init="state.init"
+              :disabled="state.disabled"
+
+            >
+            </editor>
           </a-form-item>
+
           <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
             <a-button type="primary" @click="onSubmit">
               Create
@@ -118,15 +126,52 @@
   </div>
 </template>
 <script>
-import { reactive, toRaw } from "vue";
+import { reactive, toRaw, inject } from "vue";
 import { useForm } from "@ant-design-vue/use";
 import { DInput } from "@/components";
+import tinymce from "tinymce/tinymce";
+import Editor from "@tinymce/tinymce-vue";
+import "tinymce/themes/silver";
+// 编辑器插件plugins
+// 更多插件参考：https://www.tiny.cloud/docs/plugins/
+import "tinymce/plugins/image"; // 插入上传图片插件
+import "tinymce/plugins/media"; // 插入视频插件
+import "tinymce/plugins/table"; // 插入表格插件
+import "tinymce/plugins/lists"; // 列表插件
+import "tinymce/plugins/wordcount"; // 字数统计插件
+import "tinymce/skins/ui/oxide/skin.css";
 export default {
   name: "From",
   components: {
+    Editor,
     DInput
   },
   setup() {
+    const interEvtCloseLoad = inject("interEvtCloseLoad");
+    interEvtCloseLoad();
+    tinymce.init({});
+    const state = reactive({
+      disabled: true,
+      //初始化配置
+      init: {
+        language_url: `/static/tinymce/langs/zh_CN.js`,
+        language: "zh_CN",
+        skin_url: `/static/tinymce/skins/ui/oxide`,
+        content_css: `/static/tinymce/skins/content/default/content.css`,
+        height: 300,
+        plugins: this.plugins,
+        toolbar: this.toolbar,
+        branding: false,
+        menubar: false,
+        //此处为图片上传处理函数，这个直接用了base64的图片形式上传图片，
+        //如需ajax上传可参考https://www.tiny.cloud/docs/configure/file-image-upload/#images_upload_handler
+        images_upload_handler: (blobInfo, success, failure) => {
+          console.info(failure);
+          const img = "data:image/jpeg;base64," + blobInfo.base64();
+          success(img);
+        }
+      }
+    });
     // 表单绑定数据
     const formModel = reactive({
       dbTitle: "",
@@ -196,7 +241,9 @@ export default {
           console.log("error", err);
         });
     };
+    
     return {
+      state,
       labelCol: { span: 4 },
       wrapperCol: { span: 14 },
       formModel,

@@ -1,10 +1,10 @@
 <template>
   <a-row :gutter="24">
-    <a-col :sm="12" :md="12" :xl="12"> Test</a-col>
-    <a-col :sm="12" :md="12" :xl="12"> 表单</a-col>
+    <a-col> Test</a-col>
+    <a-col> 表单</a-col>
   </a-row>
   <a-row :gutter="24">
-    <a-col :sm="12" :md="12" :xl="12">
+    <a-col>
       <a-form :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-form-item label="库名称" v-bind="validateInfos.dbName">
           <a-input
@@ -37,6 +37,10 @@
             placeholder="Autosize height with minimum and maximum number of lines"
             :auto-size="{ minRows: 2, maxRows: 5 }"
           />
+          <tinynce-editor
+            v-model="formModel.dbDesc"
+            placeholder="我是placeholder"
+          ></tinynce-editor>
         </a-form-item>
       </a-form>
     </a-col>
@@ -46,13 +50,18 @@
 <script>
 import { defineComponent, reactive, inject, onMounted, toRaw } from "vue";
 import { useForm } from "@ant-design-vue/use";
+import TinynceEditor from "@/components/editor";
 export default defineComponent({
   name: "ListFrom",
+  components: {
+    TinynceEditor
+  },
   setup() {
     const interEvtSubmit = inject("interEvtSubmit");
     const interEvtReset = inject("interEvtReset");
     const interData = inject("interData");
-
+    const interEvtCloseLoad = inject("interEvtCloseLoad");
+    interEvtCloseLoad();
     // 表单绑定数据
     const formModel = reactive({
       dbName: "", // 库名称
@@ -134,7 +143,7 @@ export default defineComponent({
     });
     return {
       labelCol: { span: 4 },
-      wrapperCol: { span: 14 },
+      wrapperCol: { span: 20 },
       formModel,
       validateInfos
     };
