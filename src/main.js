@@ -45,5 +45,6 @@ if (
   console.info("开启Mockjs 模拟数据模式******************");
   console.info(process.env.VUE_APP_MOCK);
   console.info(process.env.NODE_ENV);
+  console.info(process.env.VUE_APP_UPLOAD_URL);
   require("@/mockjs");
 }

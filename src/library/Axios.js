@@ -34,7 +34,7 @@ const HttpCodeMessage = {
 // 创建axios实例 axiso的一些基础参数配置,
 const instance = axios.create({
   // 配置在config/prod.env里的baseApi
-  baseURL: process.env.VUE_APP_API_VER,
+  baseURL: process.env.VUE_APP_API_URL,
   // 设置cross跨域 并设置访问权限 允许跨域携带cookie信息
   // 允许携带token ,这个是解决跨域产生的相关问题
   withCredentials: true,

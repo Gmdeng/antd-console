@@ -40,7 +40,7 @@ export default {
     // 图片上传服务器地址
     imgUploadUrl: {
       type: String,
-      default: ""
+      default: process.env.VUE_APP_UPLOAD_URL
     }
   },
   setup(props, { emit }) {
@@ -57,8 +57,8 @@ export default {
     // 侦听文本变化并传给外界
     watch(
       () => state.contentValue,
-      n => {
-        console.info(n);
+      () => {
+        // console.info(n);
         debounce(() => {
           emit("update:modelValue", state.contentValue);
         });
@@ -120,8 +120,9 @@ export default {
       axios
         .post(props.imgUploadUrl, params, config)
         .then(res => {
+          alert(JSON.stringify(res.data));
           if (res.data.code == 0) {
-            success(res.data.data.url); // 上传成功，在成功函数里填入图片路径
+            success(res.data.msg); // 上传成功，在成功函数里填入图片路径
             // console.log('[文件上传]', res.data)
           } else {
             failure("上传失败");

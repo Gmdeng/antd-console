@@ -50,7 +50,7 @@
 <script>
 import { defineComponent, reactive, inject, onMounted, toRaw } from "vue";
 import { useForm } from "@ant-design-vue/use";
-import TinynceEditor from "@/components/editor";
+import TinynceEditor from "@/components/Editor";
 export default defineComponent({
   name: "ListFrom",
   components: {

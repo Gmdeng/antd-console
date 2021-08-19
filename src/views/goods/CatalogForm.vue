@@ -15,8 +15,10 @@
         <a-form-item label="缩略图">
           {{ fileData }}
           <a-input v-model:value="frmModel.thumb" placeholder="请输入缩略图" />
+        <br />ss
+          {{ uploadUrl }}
           <a-upload
-            action="http://localhost:9999/api/Upload/doUpload/image"
+            :action="uploadUrl"
             list-type="picture-card"
             v-model:file-list="fileList"
             @preview="handlePreview"
@@ -98,6 +100,7 @@ export default defineComponent({
     /*** 接口============================================== end */
     // Vue2.0中 data 定义变量名称
     const state = reactive({
+      uploadUrl: process.env.VUE_APP_UPLOAD_URL,
       previewVisible: false,
       previewImage: null,
       dsTreeData: [],
