@@ -1,0 +1,182 @@
+<template>
+  <a-row :gutter="24">
+    <a-col :sm="24" :md="12" :xl="12">
+      <a-form
+        :label-col="{ span: 4 }"
+        :wrapper-col="{ span: 14 }"
+        :scrollToFirstError="true"
+      >
+        <a-form-item label="商品分类" v-bind="validateInfos.catalogId">
+          <a-tree-select
+            v-model:value="frmModel.catalogId"
+            size="large"
+            :tree-data="dsTreeData"
+            placeholder="请选择商品分类"
+            tree-default-expand-all
+          >
+          </a-tree-select>
+        </a-form-item>
+        <a-form-item label="商品名称" v-bind="validateInfos.name">
+          <a-input v-model:value="frmModel.name" placeholder="请输入商品名称" />
+        </a-form-item>
+        <a-form-item label="商品编码" v-bind="validateInfos.code">
+          <a-input v-model:value="frmModel.code" placeholder="请输入商品编码" />
+        </a-form-item>
+        <a-form-item label="商品条码" v-bind="validateInfos.barCode">
+          <a-input
+            v-model:value="frmModel.barCode"
+            placeholder="请输入商品条码"
+          />
+        </a-form-item>
+        <a-form-item label="品牌" v-bind="validateInfos.brandId">
+          <a-input v-model:value="frmModel.brandId" placeholder="请输入品牌" />
+        </a-form-item>
+        <a-form-item label="缩略图" v-bind="validateInfos.thumb">
+          <a-input v-model:value="frmModel.thumb" placeholder="请输入缩略图" />
+        </a-form-item>
+        <a-form-item label="单位" v-bind="validateInfos.unit">
+          <a-input v-model:value="frmModel.unit" placeholder="请输入单位" />
+        </a-form-item>
+        <a-form-item label="销售价" v-bind="validateInfos.price">
+          <a-input v-model:value="frmModel.price" placeholder="请输入销售价" />
+        </a-form-item>
+        <a-form-item label="价值" v-bind="validateInfos.pv">
+          <a-input v-model:value="frmModel.pv" placeholder="请输入价值" />
+        </a-form-item>
+        <a-form-item label="运费" v-bind="validateInfos.freight">
+          <a-input v-model:value="frmModel.freight" placeholder="请输入运费" />
+        </a-form-item>
+        <a-form-item label="品牌故事" v-bind="validateInfos.stroy">
+          <a-textarea
+            v-model:value="frmModel.stroy"
+            placeholder="请输入品牌故事"
+            :auto-size="{ minRows: 2, maxRows: 5 }"
+            showCount
+            :maxlength="100"
+          />
+        </a-form-item>
+        <a-form-item label="简介" v-bind="validateInfos.summary">
+          <a-textarea
+            v-model:value="frmModel.summary"
+            placeholder="简介"
+            :auto-size="{ minRows: 2, maxRows: 5 }"
+            showCount
+            :maxlength="100"
+          />
+        </a-form-item>
+      </a-form>
+    </a-col>
+  </a-row>
+</template>
+<script>
+import {
+  defineComponent,
+  reactive,
+  inject,
+  onMounted,
+  toRaw,
+  toRefs
+} from "vue";
+import goodsSpuApi from "@/api/goodsSpuApi";
+import { useForm } from "@ant-design-vue/use";
+import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
+export default defineComponent({
+  name: "UserForm",
+  setup() {
+    /*** 上层接口==============================================*/
+    const interEvtSubmit = inject("interEvtSubmit");
+    const interEvtReset = inject("interEvtReset");
+    const interData = inject("interData");
+    const interEvtCloseLoad = inject("interEvtCloseLoad");
+    /*** 接口============================================== end */
+    // 定义变量名称
+    const state = reactive({});
+
+    // 表单绑定数据
+    const frmModel = reactive({
+      id: "", // ID
+      cnName: "", // 中文名称
+      enName: "", // 英文名称
+      logo: "", // LOGO图标
+      website: "", // 网站
+      stroy: "", // 品牌故事
+      summary: "" // 简介
+    });
+
+    // 表单验证
+    const rulesRef = reactive({
+      cnName: [
+        {
+          required: true,
+          message: "请输入中文名称"
+        }
+      ],
+      enName: [
+        {
+          required: true,
+          message: "请输入英文名称"
+        }
+      ],
+      logo: [
+        {
+          required: true,
+          message: "请输入LOGO图标"
+        }
+      ]
+    });
+
+    const { resetFields, validate, validateInfos } = useForm(
+      frmModel,
+      rulesRef
+    );
+
+    // 调用上级接口--提交表单
+    interEvtSubmit(() => {
+      return validate().then(data => {
+        //state.demoData = data;
+        console.info("提交数据：", data);
+        return goodsSpuApi.saveData(toRaw(frmModel)).then(ret => {
+          return handleHttpResut(ret);
+        });
+      });
+    });
+
+    // 重置表单事件
+    interEvtReset(async () => {
+      resetFields();
+    });
+
+    // 初始化表单
+    const initFormData = () => {
+      goodsSpuApi
+        .getFormData(frmModel.id)
+        .then(res => {
+          if (res.code == 0) {
+            Object.assign(frmModel, res.data);
+            interEvtCloseLoad();
+          }
+        })
+        .catch(err => {
+          alert("9333" + err);
+        });
+    };
+
+    // 加载初始化数据
+    onMounted(() => {
+      if (interData.value == undefined) {
+        frmModel.id = null;
+        interEvtCloseLoad();
+      } else {
+        frmModel.id = interData.value;
+        initFormData();
+      }
+    });
+    return {
+      ...toRefs(state),
+      limitNumber,
+      frmModel,
+      validateInfos
+    };
+  }
+});
+</script>
