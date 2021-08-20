@@ -69,6 +69,10 @@
       </a-table>
     </a-spin>
   </div>
+  <!-- 组件 -->
+  <d-drawer title="增加SKU" ref="refAddWrap" :refreshParent="refreshPage">
+    <goods-sku-add-form></goods-sku-add-form>
+  </d-drawer>
   <d-drawer :title="formTitle" ref="refEditWrap" :refreshParent="refreshPage">
     <goods-sku-form></goods-sku-form>
   </d-drawer>
@@ -82,10 +86,12 @@ import { DownOutlined, EditOutlined } from "@ant-design/icons-vue";
 import { DDrawer, DFilterBar } from "@/components";
 
 import goodsSkuApi from "@/api/goodsSkuApi";
+import GoodsSkuAddForm from "./GoodsSkuAddForm";
 import GoodsSkuForm from "./GoodsSkuForm";
 import GoodsSkuView from "./GoodsSkuView";
 import { pager } from "@/library/Common";
 import { handleSimpleEvent } from "@/library/utils/Functions";
+
 
 export default {
   components: {
@@ -96,10 +102,12 @@ export default {
     DDrawer,
     DFilterBar,
     GoodsSkuForm,
-    GoodsSkuView
+    GoodsSkuView,
+    GoodsSkuAddForm
   },
   setup() {
     const refEditWrap = ref(),
+      refAddWrap = ref(),
       refViewWrap = ref();
     // Vue2.0中 data
     const state = reactive({
@@ -185,6 +193,7 @@ export default {
       ...toRefs(state),
       handleTableChange,
       handleEditEvent,
+      refAddWrap,
       refEditWrap,
       refViewWrap,
       refreshPage
