@@ -92,7 +92,6 @@ import GoodsSkuView from "./GoodsSkuView";
 import { pager } from "@/library/Common";
 import { handleSimpleEvent } from "@/library/utils/Functions";
 
-
 export default {
   components: {
     //图标
@@ -125,7 +124,7 @@ export default {
     const handleEditEvent = (type, data) => {
       if (type == "ADD") {
         state.formTitle = "新增表单";
-        refEditWrap.value.Open(data);
+        refAddWrap.value.Open(data);
       } else if (type == "EDIT") {
         state.formTitle = "修改表单";
         refEditWrap.value.Open(data);

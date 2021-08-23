@@ -51,6 +51,31 @@ export function FindTreeNode(treeJson, val, field = "id") {
   // }
   // return retValue;
 }
+
+// 超简单sku组合算法
+//let arr = [
+//   [1, 2, 3],
+//   [4, 5, 6],
+//   [7, 8, 9],
+//   [10, 11, 12]
+// ];
+// let allArr = cartesianSku(...arr )
+// console.log(allArr)
+export function cartesianSku() {
+  return Array.prototype.reduce.call(
+    arguments,
+    function(a, b) {
+      var ret = [];
+      a.forEach(function(a) {
+        b.options.forEach(function(b) {
+          ret.push(a.concat([b]));
+        });
+      });
+      return ret;
+    },
+    [[]]
+  );
+}
 /**
  * 树转列表
  *

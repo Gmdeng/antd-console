@@ -6,20 +6,23 @@
         :wrapper-col="{ span: 14 }"
         :scrollToFirstError="true"
       >
-        <a-form-item label="商品分类" v-bind="validateInfos.catalogId">
-          <a-tree-select
-            v-model:value="frmModel.catalogId"
-            size="large"
-            :tree-data="dsTreeData"
-            placeholder="请选择商品分类"
-            tree-default-expand-all
+        <a-form-item label="商品" v-bind="validateInfos.goodsId">
+          <a-select
+            v-model:value="frmModel.goodsId"
+            show-search
+            placeholder="选择商品"
+            style="width: 200px"
+            :default-active-first-option="false"
+            :show-arrow="false"
+            :filter-option="false"
+            :not-found-content="null"
+            :options="goodsList"
+            @search="handleSearch"
+            @change="handleChange"
           >
-          </a-tree-select>
+          </a-select>
         </a-form-item>
-        <a-form-item label="商品名称" v-bind="validateInfos.name">
-          <a-input v-model:value="frmModel.name" placeholder="请输入商品名称" />
-        </a-form-item>
-        <a-form-item label="商品编码" v-bind="validateInfos.code">
+        <a-form-item label="所属分类" v-bind="validateInfos.code">
           <a-input v-model:value="frmModel.code" placeholder="请输入商品编码" />
         </a-form-item>
         <a-form-item label="商品条码" v-bind="validateInfos.barCode">
@@ -28,41 +31,8 @@
             placeholder="请输入商品条码"
           />
         </a-form-item>
-        <a-form-item label="品牌" v-bind="validateInfos.brandId">
-          <a-input v-model:value="frmModel.brandId" placeholder="请输入品牌" />
-        </a-form-item>
-        <a-form-item label="缩略图" v-bind="validateInfos.thumb">
-          <a-input v-model:value="frmModel.thumb" placeholder="请输入缩略图" />
-        </a-form-item>
-        <a-form-item label="单位" v-bind="validateInfos.unit">
-          <a-input v-model:value="frmModel.unit" placeholder="请输入单位" />
-        </a-form-item>
-        <a-form-item label="销售价" v-bind="validateInfos.price">
-          <a-input v-model:value="frmModel.price" placeholder="请输入销售价" />
-        </a-form-item>
-        <a-form-item label="价值" v-bind="validateInfos.pv">
-          <a-input v-model:value="frmModel.pv" placeholder="请输入价值" />
-        </a-form-item>
-        <a-form-item label="运费" v-bind="validateInfos.freight">
-          <a-input v-model:value="frmModel.freight" placeholder="请输入运费" />
-        </a-form-item>
-        <a-form-item label="品牌故事" v-bind="validateInfos.stroy">
-          <a-textarea
-            v-model:value="frmModel.stroy"
-            placeholder="请输入品牌故事"
-            :auto-size="{ minRows: 2, maxRows: 5 }"
-            showCount
-            :maxlength="100"
-          />
-        </a-form-item>
-        <a-form-item label="简介" v-bind="validateInfos.summary">
-          <a-textarea
-            v-model:value="frmModel.summary"
-            placeholder="简介"
-            :auto-size="{ minRows: 2, maxRows: 5 }"
-            showCount
-            :maxlength="100"
-          />
+        <a-form-item label="商品销售规格">
+          ss
         </a-form-item>
       </a-form>
     </a-col>
@@ -90,12 +60,26 @@ export default defineComponent({
     const interEvtCloseLoad = inject("interEvtCloseLoad");
     /*** 接口============================================== end */
     // 定义变量名称
-    const state = reactive({});
+    const state = reactive({
+      goodsList: [],
+      specs: [
+        {
+          name: "彩色",
+          code: "Color",
+          options: ["红色", "黄色", "绿色", "蓝色"]
+        },
+        {
+          name: "大小",
+          code: "size",
+          options: ["10cm", "15cm", "20cm", "30cm"]
+        }
+      ]
+    });
 
     // 表单绑定数据
     const frmModel = reactive({
       id: "", // ID
-      cnName: "", // 中文名称
+      goodsId: "", // 商品ID
       enName: "", // 英文名称
       logo: "", // LOGO图标
       website: "", // 网站
@@ -161,6 +145,9 @@ export default defineComponent({
         });
     };
 
+    //
+    const handleSearch = () => {};
+    const handleChange = () => {};
     // 加载初始化数据
     onMounted(() => {
       if (interData.value == undefined) {
@@ -175,7 +162,9 @@ export default defineComponent({
       ...toRefs(state),
       limitNumber,
       frmModel,
-      validateInfos
+      validateInfos,
+      handleSearch,
+      handleChange
     };
   }
 });
