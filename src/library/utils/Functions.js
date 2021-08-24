@@ -2,6 +2,30 @@ import { Modal, notification } from "ant-design-vue";
 import { h, createVNode } from "vue";
 import { DownOutlined } from "@ant-design/icons-vue";
 
+// 超简单sku组合算法
+//let arr = [
+//   [1, 2, 3],
+//   [4, 5, 6],
+//   [7, 8, 9],
+//   [10, 11, 12]
+// ];
+// let allArr = cartesianSku(...arr )
+// console.log(allArr)
+export function cartesianSku() {
+  return Array.prototype.reduce.call(
+    arguments,
+    function(a, b) {
+      var ret = [];
+      a.forEach(function(a) {
+        b.options.forEach(function(b) {
+          ret.push(a.concat([b]));
+        });
+      });
+      return ret;
+    },
+    [[]]
+  );
+}
 /**
  * 树转列表
  *
@@ -52,30 +76,6 @@ export function FindTreeNode(treeJson, val, field = "id") {
   // return retValue;
 }
 
-// 超简单sku组合算法
-//let arr = [
-//   [1, 2, 3],
-//   [4, 5, 6],
-//   [7, 8, 9],
-//   [10, 11, 12]
-// ];
-// let allArr = cartesianSku(...arr )
-// console.log(allArr)
-export function cartesianSku() {
-  return Array.prototype.reduce.call(
-    arguments,
-    function(a, b) {
-      var ret = [];
-      a.forEach(function(a) {
-        b.options.forEach(function(b) {
-          ret.push(a.concat([b]));
-        });
-      });
-      return ret;
-    },
-    [[]]
-  );
-}
 /**
  * 树转列表
  *
@@ -157,6 +157,7 @@ export function MoneySeparator(value) {
   //   return "￥ " + retNum + ".00";
   // }
 }
+
 /**
  * 限制只能为整数字
  * @param {*} val

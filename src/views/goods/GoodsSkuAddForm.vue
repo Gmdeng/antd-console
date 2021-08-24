@@ -32,7 +32,35 @@
           />
         </a-form-item>
         <a-form-item label="商品销售规格">
-          ss
+          {{ frmModel }}
+          <a-row :gutter="[16, 16]">
+            <a-col :span="18">
+              项
+            </a-col>
+            <a-col :span="6">价格</a-col>
+          </a-row>
+          <hr />
+          <a-row :gutter="[16, 16]" v-for="(it, idx) in specList" :key="idx">
+            <a-col :span="18">
+              <a-badge
+                :count="item"
+                :number-style="{ backgroundColor: '#52c41a' }"
+                v-for="(item, i) in it"
+                :key="i"
+              >
+              </a-badge>
+              <a-input
+                v-model:value="frmModel.sku[0].name"
+                placeholder="请输入商品"
+              />
+            </a-col>
+
+            <a-col :span="6"
+              ><a-input
+                v-model:value="frmModel.sku[0].price"
+                placeholder="请输入商品价格"
+            /></a-col>
+          </a-row>
         </a-form-item>
       </a-form>
     </a-col>
@@ -45,11 +73,16 @@ import {
   inject,
   onMounted,
   toRaw,
-  toRefs
+  toRefs,
+  computed
 } from "vue";
 import goodsSpuApi from "@/api/goodsSpuApi";
 import { useForm } from "@ant-design-vue/use";
-import { limitNumber, handleHttpResut } from "@/library/utils/Functions";
+import {
+  limitNumber,
+  handleHttpResut,
+  cartesianSku
+} from "@/library/utils/Functions";
 export default defineComponent({
   name: "UserForm",
   setup() {
@@ -75,16 +108,15 @@ export default defineComponent({
         }
       ]
     });
+    const specList = computed(() => {
+      return cartesianSku(...state.specs);
+    });
 
     // 表单绑定数据
     const frmModel = reactive({
       id: "", // ID
       goodsId: "", // 商品ID
-      enName: "", // 英文名称
-      logo: "", // LOGO图标
-      website: "", // 网站
-      stroy: "", // 品牌故事
-      summary: "" // 简介
+      sku: [{ name: "", price: 0.22 }] // Sku
     });
 
     // 表单验证
@@ -160,6 +192,7 @@ export default defineComponent({
     });
     return {
       ...toRefs(state),
+      specList,
       limitNumber,
       frmModel,
       validateInfos,
