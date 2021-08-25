@@ -11,15 +11,17 @@
             v-model:value="frmModel.goodsId"
             show-search
             placeholder="选择商品"
-            style="width: 200px"
             :default-active-first-option="false"
-            :show-arrow="false"
+            :show-arrow="true"
             :filter-option="false"
             :not-found-content="null"
             :options="goodsList"
             @search="handleSearch"
             @change="handleChange"
           >
+            <template #suffixIcon>
+              <BarsOutlined @click="rebuildSku" />
+            </template>
           </a-select>
         </a-form-item>
         <a-form-item label="所属分类" v-bind="validateInfos.code">
@@ -40,26 +42,30 @@
             <a-col :span="6">价格</a-col>
           </a-row>
           <hr />
-          <a-row :gutter="[16, 16]" v-for="(it, idx) in specList" :key="idx">
+          <a-row
+            :gutter="[16, 16]"
+            v-for="(it, idx) in frmModel.skus"
+            :key="idx"
+          >
             <a-col :span="18">
               <a-badge
                 :count="item"
                 :number-style="{ backgroundColor: '#52c41a' }"
-                v-for="(item, i) in it"
+                v-for="(item, i) in it.values"
                 :key="i"
               >
               </a-badge>
-              <a-input
-                v-model:value="frmModel.sku[0].name"
-                placeholder="请输入商品"
-              />
+              <a-input v-model:value="it.name" placeholder="请输入商品" />
             </a-col>
 
             <a-col :span="6"
-              ><a-input
-                v-model:value="frmModel.sku[0].price"
-                placeholder="请输入商品价格"
-            /></a-col>
+              ><a-input v-model:value="it.price" placeholder="请输入商品价格" />
+              <MinusCircleOutlined
+                v-if="frmModel.sku.length > 1"
+                class="dynamic-delete-button"
+                @click="removeOption(option)"
+              />
+            </a-col>
           </a-row>
         </a-form-item>
       </a-form>
@@ -78,13 +84,18 @@ import {
 } from "vue";
 import goodsSpuApi from "@/api/goodsSpuApi";
 import { useForm } from "@ant-design-vue/use";
+import { MinusCircleOutlined, BarsOutlined } from "@ant-design/icons-vue";
 import {
   limitNumber,
   handleHttpResut,
   cartesianSku
 } from "@/library/utils/Functions";
 export default defineComponent({
-  name: "UserForm",
+  name: "GoodsSkuAddForm",
+  components: {
+    MinusCircleOutlined,
+    BarsOutlined
+  },
   setup() {
     /*** 上层接口==============================================*/
     const interEvtSubmit = inject("interEvtSubmit");
@@ -116,7 +127,7 @@ export default defineComponent({
     const frmModel = reactive({
       id: "", // ID
       goodsId: "", // 商品ID
-      sku: [{ name: "", price: 0.22 }] // Sku
+      skus: [] // Sku
     });
 
     // 表单验证
@@ -180,6 +191,18 @@ export default defineComponent({
     //
     const handleSearch = () => {};
     const handleChange = () => {};
+    const removeSku = item => {
+      let index = frmModel.skus.indexOf(item);
+      if (index !== -1) {
+        frmModel.skus.splice(index, 1);
+      }
+    };
+    const rebuildSku = () => {
+      frmModel.skus = [];
+      specList.value.forEach(el => {
+        frmModel.skus.push({ name: el[0], price: 0.22, values: el });
+      });
+    };
     // 加载初始化数据
     onMounted(() => {
       if (interData.value == undefined) {
@@ -197,7 +220,9 @@ export default defineComponent({
       frmModel,
       validateInfos,
       handleSearch,
-      handleChange
+      handleChange,
+      removeSku,
+      rebuildSku
     };
   }
 });
