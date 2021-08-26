@@ -11,6 +11,13 @@ export default {
     console.info(JSON.stringify(params));
     return Axios.post(`${BASE_URL}/getDataListByPage`, params);
   },
+
+  /**
+   * 分页获取数
+   */
+  getDataList(params) {
+    return Axios.post(`${BASE_URL}/getDataList`, params);
+  },
   /**
    * 保存
    */

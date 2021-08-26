@@ -1,20 +1,21 @@
 <template>
-  <a-row :gutter="24">
-    <a-col :sm="24" :md="12" :xl="12">
+  <a-row>
+    <a-col>
       <a-form
-        :label-col="{ span: 4 }"
-        :wrapper-col="{ span: 14 }"
+        :label-col="{ span: 8 }"
+        :wrapper-col="{ span: 16 }"
         :scrollToFirstError="true"
       >
         <a-form-item label="商品" v-bind="validateInfos.goodsId">
           <a-select
             v-model:value="frmModel.goodsId"
+            size="large"
             show-search
             placeholder="选择商品"
             :default-active-first-option="false"
             :show-arrow="true"
             :filter-option="false"
-            :not-found-content="null"
+            :not-found-content="fetching ? undefined : null"
             :options="goodsList"
             @search="handleSearch"
             @change="handleChange"
@@ -34,7 +35,6 @@
           />
         </a-form-item>
         <a-form-item label="商品销售规格">
-          {{ frmModel }}
           <a-row :gutter="[16, 16]">
             <a-col :span="18">
               项
@@ -47,7 +47,7 @@
             v-for="(it, idx) in frmModel.skus"
             :key="idx"
           >
-            <a-col :span="18">
+            <a-col :span="16">
               <a-badge
                 :count="item"
                 :number-style="{ backgroundColor: '#52c41a' }"
@@ -55,15 +55,17 @@
                 :key="i"
               >
               </a-badge>
-              <a-input v-model:value="it.name" placeholder="请输入商品" />
+              {{ it.name }}
             </a-col>
 
             <a-col :span="6"
               ><a-input v-model:value="it.price" placeholder="请输入商品价格" />
+            </a-col>
+            <a-col :span="1">
               <MinusCircleOutlined
-                v-if="frmModel.sku.length > 1"
+                v-if="frmModel.skus.length > 1"
                 class="dynamic-delete-button"
-                @click="removeOption(option)"
+                @click="removeSku(it)"
               />
             </a-col>
           </a-row>
@@ -85,11 +87,7 @@ import {
 import goodsSpuApi from "@/api/goodsSpuApi";
 import { useForm } from "@ant-design-vue/use";
 import { MinusCircleOutlined, BarsOutlined } from "@ant-design/icons-vue";
-import {
-  limitNumber,
-  handleHttpResut,
-  cartesianSku
-} from "@/library/utils/Functions";
+import { limitNumber, cartesianSku } from "@/library/utils/Functions";
 export default defineComponent({
   name: "GoodsSkuAddForm",
   components: {
@@ -105,6 +103,7 @@ export default defineComponent({
     /*** 接口============================================== end */
     // 定义变量名称
     const state = reactive({
+      fetching: false,
       goodsList: [],
       specs: [
         {
@@ -125,29 +124,16 @@ export default defineComponent({
 
     // 表单绑定数据
     const frmModel = reactive({
-      id: "", // ID
       goodsId: "", // 商品ID
       skus: [] // Sku
     });
 
     // 表单验证
     const rulesRef = reactive({
-      cnName: [
+      goodsId: [
         {
           required: true,
-          message: "请输入中文名称"
-        }
-      ],
-      enName: [
-        {
-          required: true,
-          message: "请输入英文名称"
-        }
-      ],
-      logo: [
-        {
-          required: true,
-          message: "请输入LOGO图标"
+          message: "请选择商品"
         }
       ]
     });
@@ -161,10 +147,13 @@ export default defineComponent({
     interEvtSubmit(() => {
       return validate().then(data => {
         //state.demoData = data;
+        console.info("提交数据：", toRaw(frmModel));
         console.info("提交数据：", data);
-        return goodsSpuApi.saveData(toRaw(frmModel)).then(ret => {
-          return handleHttpResut(ret);
-        });
+        return Promise.reject("无论怎么样都返回这个");
+
+        // return goodsSpuApi.saveData(toRaw(frmModel)).then(ret => {
+        //   return handleHttpResut(ret);
+        // });
       });
     });
 
@@ -174,12 +163,11 @@ export default defineComponent({
     });
 
     // 初始化表单
-    const initFormData = () => {
+    const fetchData = () => {
       goodsSpuApi
         .getFormData(frmModel.id)
         .then(res => {
           if (res.code == 0) {
-            Object.assign(frmModel, res.data);
             interEvtCloseLoad();
           }
         })
@@ -189,8 +177,14 @@ export default defineComponent({
     };
 
     //
-    const handleSearch = () => {};
-    const handleChange = () => {};
+    const handleSearch = val => {
+      console.log(val);
+      fetchData(val);
+    };
+    const handleChange = val => {
+      console.log(val);
+      fetchData(val);
+    };
     const removeSku = item => {
       let index = frmModel.skus.indexOf(item);
       if (index !== -1) {
@@ -205,17 +199,10 @@ export default defineComponent({
     };
     // 加载初始化数据
     onMounted(() => {
-      if (interData.value == undefined) {
-        frmModel.id = null;
-        interEvtCloseLoad();
-      } else {
-        frmModel.id = interData.value;
-        initFormData();
-      }
+      interEvtCloseLoad();
     });
     return {
       ...toRefs(state),
-      specList,
       limitNumber,
       frmModel,
       validateInfos,
