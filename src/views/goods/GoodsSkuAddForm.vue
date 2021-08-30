@@ -35,6 +35,22 @@
           />
         </a-form-item>
         <a-form-item label="商品销售规格">
+          <a-row :gutter="[16, 16]" v-for="(it, idx) in specs" :key="idx">
+            <a-col :span="6">
+              {{ it.name }}
+            </a-col>
+            <a-col :span="18">
+              <a-badge
+                :count="item"
+                :number-style="{ backgroundColor: '#52c41a' }"
+                v-for="(item, i) in it.options"
+                :key="i"
+              >
+              </a-badge>
+            </a-col>
+          </a-row>
+        </a-form-item>
+        <a-form-item label="商品销售规格">
           <a-row :gutter="[16, 16]">
             <a-col :span="18">
               项
@@ -98,7 +114,6 @@ export default defineComponent({
     /*** 上层接口==============================================*/
     const interEvtSubmit = inject("interEvtSubmit");
     const interEvtReset = inject("interEvtReset");
-    const interData = inject("interData");
     const interEvtCloseLoad = inject("interEvtCloseLoad");
     /*** 接口============================================== end */
     // 定义变量名称
@@ -165,10 +180,17 @@ export default defineComponent({
     // 初始化表单
     const fetchData = () => {
       goodsSpuApi
-        .getFormData(frmModel.id)
+        .getDataList({})
         .then(res => {
           if (res.code == 0) {
-            interEvtCloseLoad();
+            //interEvtCloseLoad();
+            state.goodsList = [];
+            res.dataList.forEach(r => {
+              state.goodsList.push({
+                value: r.id,
+                label: r.name
+              });
+            });
           }
         })
         .catch(err => {
@@ -178,12 +200,12 @@ export default defineComponent({
 
     //
     const handleSearch = val => {
-      console.log(val);
+      console.log("handleSearch...", val);
       fetchData(val);
     };
     const handleChange = val => {
-      console.log(val);
-      fetchData(val);
+      console.log("handleChange..." + JSON.stringify(val));
+      // fetchData(val);
     };
     const removeSku = item => {
       let index = frmModel.skus.indexOf(item);

@@ -13,7 +13,7 @@ export default {
   },
 
   /**
-   * 分页获取数
+   * 查询
    */
   getDataList(params) {
     return Axios.post(`${BASE_URL}/getDataList`, params);
