@@ -198,14 +198,21 @@ export default defineComponent({
         });
     };
 
-    //
+    const filterSku = val => {
+      return state.skuList.filter(key => {
+        return key == val;
+      });
+    };
+    // 下拉选项查询
     const handleSearch = val => {
       console.log("handleSearch...", val);
       fetchData(val);
     };
+    // 下拉选项选中
     const handleChange = val => {
       console.log("handleChange..." + JSON.stringify(val));
       // fetchData(val);
+      filterSku(val);
     };
     const removeSku = item => {
       let index = frmModel.skus.indexOf(item);
