@@ -1,9 +1,9 @@
 <template>
-  <a-row>
-    <a-col>
+  <a-row :gutter="24">
+    <a-col :sm="24" :md="24" :xl="24">
       <a-form
-        :label-col="{ span: 8 }"
-        :wrapper-col="{ span: 16 }"
+        :label-col="{ span: 4 }"
+        :wrapper-col="{ span: 14 }"
         :scrollToFirstError="true"
       >
         <a-form-item label="商品" v-bind="validateInfos.goodsId">
@@ -26,6 +26,7 @@
           </a-select>
         </a-form-item>
         <a-form-item label="所属分类" v-bind="validateInfos.code">
+          {{ currentSpu }}
           <a-input v-model:value="frmModel.code" placeholder="请输入商品编码" />
         </a-form-item>
         <a-form-item label="商品条码" v-bind="validateInfos.barCode">
@@ -73,7 +74,6 @@
               </a-badge>
               {{ it.name }}
             </a-col>
-
             <a-col :span="6"
               ><a-input v-model:value="it.price" placeholder="请输入商品价格" />
             </a-col>
@@ -119,6 +119,8 @@ export default defineComponent({
     // 定义变量名称
     const state = reactive({
       fetching: false,
+      currentSpu: null,
+      spuList: [],
       goodsList: [],
       specs: [
         {
@@ -185,6 +187,7 @@ export default defineComponent({
           if (res.code == 0) {
             //interEvtCloseLoad();
             state.goodsList = [];
+            state.spuList = res.dataList;
             res.dataList.forEach(r => {
               state.goodsList.push({
                 value: r.id,
@@ -197,11 +200,23 @@ export default defineComponent({
           alert("9333" + err);
         });
     };
-
-    const filterSku = val => {
-      return state.skuList.filter(key => {
-        return key == val;
+    // 获取SKU列表
+    const fetchSkuData = val => {
+      goodsSpuApi.getSkusOptions({ name: val }).then(res => {
+        if (res.code == 0) {
+          res.dataList.forEach(s => {
+            console.info(s);
+          });
+        }
       });
+      // return val;
+    };
+    // 查找SPU
+    const filterSpu = val => {
+      let spus = state.spuList.filter(key => {
+        return key.id == val;
+      });
+      return spus.length > 0 ? spus[0] : {};
     };
     // 下拉选项查询
     const handleSearch = val => {
@@ -212,7 +227,8 @@ export default defineComponent({
     const handleChange = val => {
       console.log("handleChange..." + JSON.stringify(val));
       // fetchData(val);
-      filterSku(val);
+      state.currentSpu = filterSpu(val);
+      fetchSkuData(state.currentSpu.id);
     };
     const removeSku = item => {
       let index = frmModel.skus.indexOf(item);
