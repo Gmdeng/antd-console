@@ -11,6 +11,10 @@ import { DownOutlined } from "@ant-design/icons-vue";
 // ];
 // let allArr = cartesianSku(...arr )
 // console.log(allArr)
+/**
+ * 笛卡尔 构建ＳＫＵ
+ * @returns 笛卡尔
+ */
 export function cartesianSku() {
   return Array.prototype.reduce.call(
     arguments,

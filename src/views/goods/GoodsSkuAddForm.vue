@@ -26,7 +26,7 @@
           </a-select>
         </a-form-item>
         <a-form-item label="所属分类" v-bind="validateInfos.code">
-          {{ currentSpu }}
+          == {{ currentSpu.catalogName }}
           <a-input v-model:value="frmModel.code" placeholder="请输入商品编码" />
         </a-form-item>
         <a-form-item label="商品条码" v-bind="validateInfos.barCode">
@@ -48,6 +48,11 @@
                 :key="i"
               >
               </a-badge>
+              <a-checkbox-group v-model="stateSkus" :options="it.options">
+                <template #label="{ value }">
+                  <span style="color: red">{{ value }} - DDD</span>
+                </template>
+              </a-checkbox-group>
             </a-col>
           </a-row>
         </a-form-item>
@@ -142,7 +147,8 @@ export default defineComponent({
     // 表单绑定数据
     const frmModel = reactive({
       goodsId: "", // 商品ID
-      skus: [] // Sku
+      skus: [], // Sku
+      stateSkus: []
     });
 
     // 表单验证
@@ -205,7 +211,7 @@ export default defineComponent({
       goodsSpuApi.getSkusOptions({ name: val }).then(res => {
         if (res.code == 0) {
           res.dataList.forEach(s => {
-            console.info(s);
+            console.info(JSON.stringify(s));
           });
         }
       });
@@ -213,6 +219,7 @@ export default defineComponent({
     };
     // 查找SPU
     const filterSpu = val => {
+      console.info(state.spuList);
       let spus = state.spuList.filter(key => {
         return key.id == val;
       });
@@ -225,9 +232,10 @@ export default defineComponent({
     };
     // 下拉选项选中
     const handleChange = val => {
-      console.log("handleChange..." + JSON.stringify(val));
+      console.log("handleChange.ID.." + JSON.stringify(val));
       // fetchData(val);
       state.currentSpu = filterSpu(val);
+      rebuildSku();
       fetchSkuData(state.currentSpu.id);
     };
     const removeSku = item => {
@@ -239,7 +247,11 @@ export default defineComponent({
     const rebuildSku = () => {
       frmModel.skus = [];
       specList.value.forEach(el => {
-        frmModel.skus.push({ name: el[0], price: 0.22, values: el });
+        frmModel.skus.push({
+          name: el[0],
+          price: state.currentSpu.price,
+          values: el
+        });
       });
     };
     // 加载初始化数据
