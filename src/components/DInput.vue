@@ -164,7 +164,8 @@ export default defineComponent({
         left: $index-has-icon;
       }
       .material-input {
-        text-indent: $index-has-icon;
+        padding-left: 30px;
+        /* text-indent: $index-has-icon; */
       }
     }
     .material-input {

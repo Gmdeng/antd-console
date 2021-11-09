@@ -13,10 +13,14 @@ const mutations = {
   }
 };
 const actions = {
-  async login() {},
+  async login({ state, commit }) {
+    console.info(state);
+    commit("saveToken", "888888888888");
+  },
   async logout({ state, commit }) {
     // alert(998);
     commit("saveToken", 9898);
+    // 提示确认
     Modal.confirm({
       title: "您确认要退出系统吗?" + state.accessToken,
       icon: createVNode(ExclamationCircleOutlined),
