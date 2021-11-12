@@ -9,7 +9,6 @@
 export const saveInLocal = store => {
   // 当 store 初始化后调用
   console.log("store初始化了");
-
   store.subscribe((mutaion, state) => {
     // 每次 mutatios 之后调用
     // mutation 的格式为 { type, payload }

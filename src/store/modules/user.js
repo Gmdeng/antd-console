@@ -1,5 +1,5 @@
 let state = {
-    username: "admin",
+    username: "Ricky-admin",
     total: 0,
     accessToken: "admin",
     avatar: "随意设置",

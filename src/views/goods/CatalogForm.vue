@@ -14,8 +14,10 @@
         </a-form-item>
         <a-form-item label="缩略图">
           {{ fileData }}
-          <a-input v-model:value="frmModel.thumb" placeholder="请输入缩略图" />
-        <br />ss
+          <a-input
+            v-model:value="frmModel.thumb"
+            placeholder="请输入缩略图"
+          /><br />
           {{ uploadUrl }}
           <a-upload
             :action="uploadUrl"

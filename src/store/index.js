@@ -1,22 +1,31 @@
 import { createStore, createLogger } from "vuex";
+import createPersistedState from "vuex-persistedstate";
 import plugin from "./plugin/plugins";
 
 // 生产
 const isProd = process.env.NODE_ENV == "production";
 
-// import menu from "./modules/menu";
+// 导入所有模块
+let modulesFiles = require.context("./modules", false, /\.js$/);
 
-let files = require.context("./modules", false, /\.js$/),
-  customModules = {};
-files.keys().forEach(key => {
-  customModules[key.replace(/\.\/|\.js/g, "")] = files(key).default;
+//
+let customModules = {};
+modulesFiles.keys().forEach(key => {
+  customModules[key.replace(/\.\/|\.js/g, "")] = modulesFiles(key).default;
 });
+// const modules = modulesFiles.keys().reduce((modules, modulePath) => {
+//   const moduleName = modulePath.replace(/^\.\/(.*)\.\w+$/, "$1");
+//   const value = modulesFiles(modulePath);
+//   modules[moduleName] = value.default;
+//   return modules;
+// }, {});
+
 // 导入所有 vuex 模块，自动加入namespaced:true，用于解决vuex命名冲突
 Object.keys(customModules).forEach(key => {
   customModules[key]["namespaced"] = true;
 });
 // 插件
-const customPlugins = [plugin];
+const customPlugins = [plugin, createPersistedState()];
 // 非生产环境添加日志
 if (!isProd) {
   customPlugins.push(createLogger());
@@ -30,7 +39,8 @@ export default createStore({
 });
 
 /**
- * 
+ * mapGetters,mapState,mapMutations,mapActions
+ * 格式: mapActions(namespace,[mutationName])
  *     
  *  获取整个state
     获取: userStore = computed( () => store.state.user )

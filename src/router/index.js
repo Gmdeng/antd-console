@@ -1,6 +1,8 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import defaultRouter from "./DefaultRouters";
 import runtime from "./RunRouters";
+import store from "@/store/index";
+// 子路由
 let newChild = defaultRouter[0].children.concat(runtime);
 defaultRouter[0].children = newChild;
 // console.info(newChild);
@@ -47,5 +49,32 @@ const router = createRouter({
     }
   ]
 });
+// 路由拦截器 - 前置拦截
+router.beforeEach((to, form, next) => {
+  console.info("router.beforeEach.................");
+  // 创建存储对象
+  console.info(store.state.user.username);
+  console.info(store.getters);
+  console.info(form);
+  //document.title = to.matched[0].meta.title;
+  // 登录页面直接跳出
+  if (to.name === "Login") {
+    next();
+    return;
+  }
+  // 需要登录验证
+  // TODO
+  // 需要权限验证
+  // TODO
+  next();
+});
 
+//
+router.beforeResolve(() => {
+  console.info("router.beforeResolve.................");
+});
+// 路由拦截器 - 前置拦截
+router.afterEach(() => {
+  console.info("router.afterEach.................");
+});
 export default router;

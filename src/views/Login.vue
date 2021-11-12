@@ -8,7 +8,10 @@
         layout="vertical"
       >
         <a-form-item>
-          <d-input icon="UserOutlined" v-model:value="formState.oldPasswd"
+          <d-input
+            icon="UserOutlined"
+            v-model:value="formState.oldPasswd"
+            key="userid"
             >用户名/手机号</d-input
           >
         </a-form-item>
@@ -36,6 +39,9 @@
           <a-button type="primary" block size="large" @click="handleLogin"
             >登录</a-button
           >
+          <a-button type="primary" block size="large" @click="onlogin"
+            >登录3</a-button
+          >
         </a-form-item>
         <a-form-item>
           <a-tree-select
@@ -47,7 +53,7 @@
               children: 'children',
               key: 'key',
               value: 'name',
-              title: 'tit'
+              title: 'title'
             }"
             placeholder="Please select"
             tree-default-expand-all
@@ -61,12 +67,14 @@
 <script>
 import { defineComponent, reactive, toRefs } from "vue";
 import { DInput } from "@/components";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
+import { useStore, mapActions } from "vuex";
 export default defineComponent({
   components: { DInput },
   name: "Login",
   setup() {
-    const router = useRouter();
+    //const router = useRouter();
+    const store = useStore();
     const formState = reactive({
       newPasswd: "hell", // 新密码
       oldPasswd: "", // 旧密码
@@ -112,13 +120,15 @@ export default defineComponent({
     });
     //登录处理事件
     const handleLogin = () => {
-      alert("3333");
-      router.push("/home");
+      console.info(store);
+      alert("3333" + store.state.auth.accessToken);
+      //router.push("/home");
     };
     return {
       ...toRefs(state),
       formState,
-      handleLogin
+      handleLogin,
+      ...mapActions("auth", ["onlogin"])
     };
   }
 });

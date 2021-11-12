@@ -154,10 +154,12 @@ export default defineComponent({
 
     // 表单验证
     const rulesRef = reactive({
-      catalogId: [{
+      catalogId: [
+        {
           required: true,
           message: "请选择商品分类"
-        }],
+        }
+      ],
       name: [
         {
           required: true,
