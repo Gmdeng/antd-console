@@ -2,6 +2,7 @@ import { createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 //import confirm from "ant-design-vue/es/modal/confirm";
 import { Modal } from "ant-design-vue";
+import authApi from "@/api/authApi";
 /******************************
  * 用户授权相关
  *****************************/
@@ -24,7 +25,7 @@ const mutations = {
   },
   onlogin(state, data) {
     console.info(state);
-    alert("hello " + data);
+    alert("hello ===" + data);
   }
 };
 
@@ -32,12 +33,25 @@ const mutations = {
 // 组件调用方式: this.$store.dispatch('addPlus', [value])
 const actions = {
   // 登录操作
-  async login({ state, commit }) {
+  login({ commit }, payload) {
     console.info(state);
-    commit("saveToken", "888888888888");
+    authApi
+      .login(payload)
+      .then(res => {
+        if (res.code == 0) {
+          return Promise.resolve("success");
+        } else {
+          return Promise.reject(res.msg);
+        }
+      })
+      .catch(() => {
+        return Promise.reject("fail");
+      });
+    commit("onlogin", JSON.stringify(payload));
+    return Promise.reject("success");
   },
   // 退出操作
-  async logout({ state, commit }) {
+  logout({ state, commit }) {
     // alert(998);
     commit("saveToken", 9898);
     // 提示确认

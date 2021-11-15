@@ -36,7 +36,12 @@
           </a-input-password>
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" block size="large" @click="handleLogin"
+          <a-button
+            type="primary"
+            block
+            size="large"
+            @click="handleLogin"
+            :loading="loading_login"
             >登录</a-button
           >
           <a-button type="primary" block size="large" @click="onlogin"
@@ -81,6 +86,7 @@ export default defineComponent({
       rePasswd: "" // 重新密码
     });
     const state = reactive({
+      loading_login: false, // 登录标记
       treeData: [
         {
           tit: "Node1", //按照官方文档这里的键值对应该是title 下面就不写注释了
@@ -121,7 +127,20 @@ export default defineComponent({
     //登录处理事件
     const handleLogin = () => {
       console.info(store);
+      state.loading_login = true;
       alert("3333" + store.state.auth.accessToken);
+      store
+        .dispatch("auth/login", formState)
+        .then(res => {
+          alert(res);
+        })
+        .catch(err => {
+          alert("Fail: " + err);
+        })
+        .finally(() => {
+          state.loading_login = false;
+        });
+
       //router.push("/home");
     };
     return {
