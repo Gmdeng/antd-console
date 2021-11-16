@@ -1,4 +1,22 @@
 // 表单验证
+export async function PasswordValidator(rule, value) {
+  /** 密码至少包含 数字和英文、长度6-20 */
+  //const regex0= /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/;
+  /** 密码至少包含 数字，英文、字符中的两种以上， 长度6-20 */
+  //const regex1= /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?!([^(0-9a-zA-Z)])+$).{6,20}$/;
+  /** 密码至少包含 数字，英文、可以有字符， 长度6-20 */
+  //const regex2= /(?=.*([a-zA-Z].*))(?=.*[0-9].*)[a-zA-Z0-9-*/+.~!@#$%^&*()]{6,20}$/;
+  //1, 密码中必须包含大小写 字母、数字、特称字符，至少6个字符，最多30个字符；
+  //const pwdRegex = /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{6,30}$/;
+  //2, 密码中必须包含字母（不区分大小写）、数字、特称字符，至少6个字符，最多30个字符；
+  const pwdRegex = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{6,30}$/;
+  //3, 密码中必须包含字母（不区分大小写）、数字，至少6个字符，最多30个字符；
+  //const pwdRegex = new RegExp("(?=.*[0-9])(?=.*[a-zA-Z]).{6,30}");
+  if (!pwdRegex.test(value)) {
+    return Promise.reject("密码中必须包含字母、数字");
+  }
+  return Promise.resolve();
+}
 // 手机号验证
 export async function MobileNumberValidator(rule, value) {
   const idcardReg = /^1(3|4|5|6|7|8|9)\d{9}$/;

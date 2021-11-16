@@ -9,7 +9,11 @@ export default {
    *  用户登录
    * @returns
    */
-  login() {
-    return Axios.get(`${BASE_URL}/login`);
-  }
+  login(params) {
+    return Axios.post(`${BASE_URL}/login`, params);
+  },
+  /**
+   * 获取用户权限
+   */
+  getPrivilege() {}
 };

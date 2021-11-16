@@ -11,7 +11,7 @@ const state = {
   // 访问TOKEN
   accessToken: "Init-Data",
   // 权限
-  prliment: {}
+  privilege: []
 };
 // 计算属性
 const getters = {};
@@ -19,9 +19,9 @@ const getters = {};
 // 同步处理方法
 // 组件调用方式: this.$store.commit('setState', [value])
 const mutations = {
-  saveToken(state, data) {
+  //保存
+  saveAccessToken(state, data) {
     state.accessToken = data;
-    // alert("Ext: " + data);
   },
   onlogin(state, data) {
     console.info(state);
@@ -39,6 +39,7 @@ const actions = {
       .login(payload)
       .then(res => {
         if (res.code == 0) {
+          commit("saveAccessToken", res.data);
           return Promise.resolve("success");
         } else {
           return Promise.reject(res.msg);
